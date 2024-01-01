@@ -1,0 +1,17 @@
+{
+  "id": "sentiment",
+  "title": "Sentiment",
+  "description": "Implementation of the Sentiment TTRPG system for Foundry VTT.",
+  "version": "0.1.0",
+  "url": "https://github.com/tomlaflin/sentiment",
+  "license": "LICENSE.txt",
+  "authors": [
+    {
+      "name": "Tom Laflin",
+      "email": "tom.laflin@gmail.com",
+      "url": "https://github.com/tomlaflin"
+    }
+  ],
+  "gridDistance": 5,
+  "gridUnits": "ft"
+}
