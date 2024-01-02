@@ -12,6 +12,7 @@
       "url": "https://github.com/tomlaflin"
     }
   ],
+  "esmodules": [ "sentiment.mjs" ],
   "gridDistance": 5,
   "gridUnits": "ft"
 }
