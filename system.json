@@ -13,6 +13,7 @@
     }
   ],
   "esmodules": [ "sentiment.mjs" ],
+  "styles": [ "styles/sentiment.css" ],
   "gridDistance": 5,
   "gridUnits": "ft"
 }
