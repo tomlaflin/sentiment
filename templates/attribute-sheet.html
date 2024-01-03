@@ -3,6 +3,8 @@
         <img src="{{data.img}}" data-edit="img" title="{{data.name}}" height="64" width="64" />
         <h1><input name="name" type="text" value="{{data.name}}" placeholder="Name" /></h1>
     </header>
+    <label class="color-label"> Color: </label>
+    <input type="color" name="colorPicker" value="{{colorString}}" />
     <label class="modifier-label"> Modifier: </label>
     <input type="number" name="system.modifier" value="{{data.system.modifier}}" min="0" data-dtype="Number" />
 </form>

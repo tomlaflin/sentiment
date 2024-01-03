@@ -9,10 +9,22 @@ export default class AttributeSheet extends ItemSheet {
             height: 600
         });
     }
-    
+
+    /** @inheritdoc */
     async getData(options) {
         const context = await super.getData(options);
-        //context.systemData = context.data.system;
+        const colorRGB = context.data.system.color;
+        context.colorString = foundry.utils.Color.fromRGB(colorRGB).toString();
+
         return context;
+    }
+
+    /** @inheritdoc */
+    async _updateObject(event, formData) {
+        const colorString = formData[`colorPicker`];
+        const colorRGB = foundry.utils.Color.fromString(colorString).rgb;
+        await this.object.update({ "system.color": colorRGB }, {});
+
+        return super._updateObject(event, formData);
     }
 }
