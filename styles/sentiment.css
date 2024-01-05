@@ -16,3 +16,25 @@
 .sentiment .editor-content {
 	height: 100%;
 }
+
+.sentiment .attribute-list {
+	list-style: none;
+	margin: 7px 0;
+	padding: 0;
+	overflow-y: auto;
+}
+
+.sentiment .attribute-list .attribute {
+	min-height: 30px;
+	line-height: 24px;
+	padding: 3px 0;
+	border-bottom: 1px solid #BBB;
+	align-items: stretch;
+}
+
+.sentiment .attribute-list .attribute .attribute-image {
+	width: 24px;
+	height: 24px;
+	flex: 0 0 24px;
+	margin-right: 5px;
+}

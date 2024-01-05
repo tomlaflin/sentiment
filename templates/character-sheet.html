@@ -15,7 +15,19 @@
         </div>
 
         <div class="tab attributes" data-group="primary" data-tab="attributes">
-            
+            <ol class="attribute-list">
+                {{#each attributes as |attribute id|}}
+                <li class="attribute flexrow" data-attribute-id="{{attribute._id}}">
+                    <img class="attribute-image" src="{{attribute.img}}" title="{{attribute.name}}" />
+                    <h4 class="attribute-name">{{attribute.name}}</h4>
+                    <p class="attribute-color">{{attribute.system.color}}</p>
+                    <p class="attribute-modifier">{{attribute.system.modifier}}</p>
+                </li>
+                {{/each}}
+            </ol>
+            <p>
+                <a class="attribute-control" title="Add New Attribute"><i class="fas fa-plus"></i> Add New Attribute</a>
+            </p>
         </div>
     </section>
 </form>
