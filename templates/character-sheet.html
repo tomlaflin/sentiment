@@ -17,16 +17,20 @@
         <div class="tab attributes" data-group="primary" data-tab="attributes">
             <ol class="attribute-list">
                 {{#each attributes as |attribute id|}}
-                <li class="attribute flexrow" data-attribute-id="{{attribute._id}}">
+                <li class="attribute flexrow" data-item-id="{{attribute._id}}">
                     <img class="attribute-image" src="{{attribute.img}}" title="{{attribute.name}}" />
                     <h4 class="attribute-name">{{attribute.name}}</h4>
                     <p class="attribute-color">{{attribute.system.color}}</p>
                     <p class="attribute-modifier">{{attribute.system.modifier}}</p>
+                    <div class="attribute-controls">
+                        <a class="attribute-control attribute-open" title="Open Attribute"> <i class="fas fa-edit"></i> Open</a>
+                        <a class="attribute-control attribute-delete" title="Delete Attribute"> <i class="fas fa-trash"></i> Delete</a>
+                    </div>
                 </li>
                 {{/each}}
             </ol>
             <p>
-                <a class="attribute-control" title="Add New Attribute"><i class="fas fa-plus"></i> Add New Attribute</a>
+                <a class="attribute-control attribute-add" title="Add New Attribute"><i class="fas fa-plus"></i> Add New Attribute</a>
             </p>
         </div>
     </section>

@@ -49,19 +49,20 @@ export default class CharacterSheet extends ActorSheet {
     activateListeners(html) {
         super.activateListeners(html);
         
-        if (!this.isEditable) {
-            return;
+        html.find('.attribute-open').click(this.#onAttributeOpen.bind(this));
+
+        if (this.isEditable) {
+            html.find(".attribute-add").click(this.#onAttributeAdd.bind(this));
+            html.find(".attribute-delete").click(this.#onAttributeDelete.bind(this));
         }
-        
-        html.find(".attribute-control").click(this.#onAttributeControlClick.bind(this));
     }
 
     /**
-    * Handle event when the user clicks an Attribute Control
+    * Handle event when the user adds an attribute.
     * @param event
     * @private
     */
-    async #onAttributeControlClick(event) {
+    async #onAttributeAdd(event) {
         event.preventDefault();
         
         const itemData = {
@@ -70,5 +71,31 @@ export default class CharacterSheet extends ActorSheet {
         };
         
         return await Item.create(itemData, { parent: this.actor });
+    }
+
+    /**
+    * Handle event when the user opens an attribute.
+    * @param event
+    * @private
+    */
+    #onAttributeOpen(event) {
+        event.preventDefault();
+        
+        const listItem = $(event.currentTarget).parents(".attribute");
+        const attribute = this.actor.items.get(listItem.data("itemId"));
+        attribute.sheet.render(true);
+    }
+
+    /**
+    * Handle event when the user deletes an attribute.
+    * @param event
+    * @private
+    */
+    #onAttributeDelete(event) {
+        event.preventDefault();
+        
+        const listItem = $(event.currentTarget).parents(".attribute");
+        const attribute = this.actor.items.get(listItem.data("itemId"));
+        attribute.delete();
     }
 }
