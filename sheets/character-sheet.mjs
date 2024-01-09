@@ -51,10 +51,13 @@ export default class CharacterSheet extends ActorSheet {
         
         html.find('.attribute-open').click(this.#onAttributeOpen.bind(this));
 
-        if (this.isEditable) {
-            html.find(".attribute-add").click(this.#onAttributeAdd.bind(this));
-            html.find(".attribute-delete").click(this.#onAttributeDelete.bind(this));
+        if (!this.isEditable) {
+            return;
         }
+
+        html.find(".attribute-add").click(this.#onAttributeAdd.bind(this));
+        html.find(".attribute-delete").click(this.#onAttributeDelete.bind(this));
+        html.find(".roll-to-do").click(this.#onRollToDo.bind(this));
     }
 
     /**
@@ -97,5 +100,36 @@ export default class CharacterSheet extends ActorSheet {
         const listItem = $(event.currentTarget).parents(".attribute");
         const attribute = this.actor.items.get(listItem.data("itemId"));
         attribute.delete();
+    }
+
+    /**
+    * Handle event when the user performs a Roll to Do.
+    * @param event
+    * @private
+    */
+    async #onRollToDo(event) {
+        event.preventDefault();
+
+        let d20Roll = new Roll("1d20");
+        await d20Roll.evaluate();
+
+        let d6Roll = new Roll("1d6");
+        await d6Roll.evaluate();
+
+        const template = "systems/sentiment/templates/rolls/roll-to-do.html";
+        const html = await renderTemplate(template, {
+            d20Roll: d20Roll,
+            d6Roll: d6Roll,
+            total: d20Roll.total + d6Roll.total
+        });
+
+        let message = {
+            speaker: {
+                alias: this.actor.name
+            },
+            content: html
+        };
+
+        ChatMessage.create(message);
     }
 }
