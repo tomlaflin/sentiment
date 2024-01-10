@@ -1,5 +1,7 @@
 export default class CharacterSheet extends ActorSheet {
 
+    #swingAttributeId;
+
     /** @inheritdoc */
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
@@ -15,6 +17,7 @@ export default class CharacterSheet extends ActorSheet {
 
         await this.#populateDescription(context);
         this.#populateAttributes(context);
+        this.#cacheSwingAttribute(context);
 
         return context;
     }
@@ -45,10 +48,22 @@ export default class CharacterSheet extends ActorSheet {
         }
     }
 
+    /**
+    * Find the attribute associated with the character's current swing, if any, and cache it for reference after the form is rendered.
+    * @param context
+    * @private
+    */
+    #cacheSwingAttribute(context) {
+        // Guard against the case where the attribute associated with our swing was deleted out from under us.
+        const attributeExists = context.attributes.some((attribute) => attribute._id == context.data.system.swing.attributeId);
+        this.#swingAttributeId = attributeExists ? context.data.system.swing.attributeId : null;
+    }
+
     /** @inheritdoc */
     activateListeners(html) {
         super.activateListeners(html);
-        
+
+        this.#updateSwingControls();
         html.find('.attribute-open').click(this.#onAttributeOpen.bind(this));
 
         if (!this.isEditable) {
@@ -58,6 +73,24 @@ export default class CharacterSheet extends ActorSheet {
         html.find(".attribute-add").click(this.#onAttributeAdd.bind(this));
         html.find(".attribute-delete").click(this.#onAttributeDelete.bind(this));
         html.find(".roll-to-do").click(this.#onRollToDo.bind(this));
+    }
+
+    /**
+    * Set value and display for the swing controls based on the cached swingAttributeId.
+    * @param context
+    * @private
+    */
+    #updateSwingControls() {
+        this.form.querySelector(".swing-attribute-selector").value = this.#swingAttributeId;
+
+        const swingValueInput = this.form.querySelector(".swing-value");
+        if (this.#swingAttributeId === null) {
+            swingValueInput.style.display = "none";
+            swingValueInput.value = 0;
+        }
+        else {
+            swingValueInput.style.display = "flex";
+        }
     }
 
     /**
@@ -131,5 +164,12 @@ export default class CharacterSheet extends ActorSheet {
         };
 
         ChatMessage.create(message);
+    }
+
+    /** @inheritdoc */
+    async _updateObject(event, formData) {
+        await this.object.update({ "system.swing.attributeId": formData[`swing-attribute-selector`] }, {});
+
+        return super._updateObject(event, formData);
     }
 }

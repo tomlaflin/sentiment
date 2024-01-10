@@ -32,6 +32,15 @@
             <p>
                 <a class="attribute-control attribute-add" title="Add New Attribute"><i class="fas fa-plus"></i> Add New Attribute</a>
             </p>
+            <p class="flexrow">
+                <select class="swing-attribute-selector" name="swing-attribute-selector">
+                    <option value=null>None</option>
+                    {{#each attributes as |attribute id|}}
+                    <option value="{{attribute._id}}">{{attribute.name}}</option>
+                    {{/each}}
+                </select>
+                <input type="number" class="swing-value" name="system.swing.value" value="{{data.system.swing.value}}" min="0" data-dtype="Number" />
+            </p>
             <p>
                 <button class="button roll-to-do" type="button" title="Roll to Do">Roll to Do</button>
             </p>
