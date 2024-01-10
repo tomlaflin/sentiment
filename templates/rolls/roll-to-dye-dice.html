@@ -1,0 +1,4 @@
+<h3>Roll to Dye!</h3>
+{{#each attributeDice as |attributeDie|}}
+<p>{{attributeDie.attribute.name}}: {{attributeDie.roll}} (+{{attributeDie.attribute.system.modifier}})</p>
+{{/each}}

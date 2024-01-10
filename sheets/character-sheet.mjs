@@ -1,5 +1,6 @@
 export default class CharacterSheet extends ActorSheet {
 
+    #attributes;
     #swingAttribute;
     #swingValue;
 
@@ -41,12 +42,14 @@ export default class CharacterSheet extends ActorSheet {
     * @private
     */
     #populateAttributes(context) {
-        context.attributes = [];
+        this.#attributes = [];
         for (let item of context.items) {
             if (item.type == "attribute") {
-                context.attributes.push(item);
+                this.#attributes.push(item);
             }
         }
+
+        context.attributes = this.#attributes;
     }
 
     /**
@@ -58,6 +61,13 @@ export default class CharacterSheet extends ActorSheet {
         const swingAttribute = context.attributes.find((attribute) => attribute._id == context.data.system.swing.attributeId);
         this.#swingAttribute = swingAttribute ?? null;
         this.#swingValue = swingAttribute ? context.data.system.swing.value : 0;
+    }
+
+    /** @inheritdoc */
+    async _updateObject(event, formData) {
+        await this.object.update({ "system.swing.attributeId": formData[`swing-attribute-selector`] }, {});
+
+        return super._updateObject(event, formData);
     }
 
     /** @inheritdoc */
@@ -74,6 +84,7 @@ export default class CharacterSheet extends ActorSheet {
         html.find(".attribute-add").click(this.#onAttributeAdd.bind(this));
         html.find(".attribute-delete").click(this.#onAttributeDelete.bind(this));
         html.find(".roll-to-do").click(this.#onRollToDo.bind(this));
+        html.find(".roll-to-dye").click(this.#onRollToDye.bind(this));
     }
 
     /**
@@ -163,8 +174,39 @@ export default class CharacterSheet extends ActorSheet {
             templateValues.total += this.#swingValue;
         }
 
-        const html = await renderTemplate(templatePath, templateValues);
+        this.#renderToChatMessage(templatePath, templateValues);
+    }
 
+    /**
+    * Handle event when the user performs a Roll to Do.
+    * @param event
+    * @private
+    */
+    async #onRollToDye(event) {
+        event.preventDefault();
+
+        let attributeDice = [];
+
+        for (let attribute of this.#attributes) {
+            let d6Roll = new Roll("1d6");
+            await d6Roll.evaluate();
+            attributeDice.push({
+                attribute: attribute,
+                roll: d6Roll.total
+            });
+        }
+
+        const templatePath = "systems/sentiment/templates/rolls/roll-to-dye-dice.html";
+        this.#renderToChatMessage(templatePath, { attributeDice: attributeDice });
+    }
+
+    /**
+    * Render an HTML template with arguments as a chat message with this character as the speaker.
+    * @param event
+    * @private
+    */
+    async #renderToChatMessage(templatePath, args) {
+        const html = await renderTemplate(templatePath, args);
         let message = {
             speaker: {
                 alias: this.actor.name
@@ -173,12 +215,5 @@ export default class CharacterSheet extends ActorSheet {
         };
 
         ChatMessage.create(message);
-    }
-
-    /** @inheritdoc */
-    async _updateObject(event, formData) {
-        await this.object.update({ "system.swing.attributeId": formData[`swing-attribute-selector`] }, {});
-
-        return super._updateObject(event, formData);
     }
 }
