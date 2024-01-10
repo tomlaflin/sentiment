@@ -1,6 +1,7 @@
 export default class CharacterSheet extends ActorSheet {
 
-    #swingAttributeId;
+    #swingAttribute;
+    #swingValue;
 
     /** @inheritdoc */
     static get defaultOptions() {
@@ -17,7 +18,7 @@ export default class CharacterSheet extends ActorSheet {
 
         await this.#populateDescription(context);
         this.#populateAttributes(context);
-        this.#cacheSwingAttribute(context);
+        this.#cacheSwing(context);
 
         return context;
     }
@@ -49,14 +50,14 @@ export default class CharacterSheet extends ActorSheet {
     }
 
     /**
-    * Find the attribute associated with the character's current swing, if any, and cache it for reference after the form is rendered.
+    * Find the properties associated with the character's current swing, if any, and cache them for reference after the form is rendered.
     * @param context
     * @private
     */
-    #cacheSwingAttribute(context) {
-        // Guard against the case where the attribute associated with our swing was deleted out from under us.
-        const attributeExists = context.attributes.some((attribute) => attribute._id == context.data.system.swing.attributeId);
-        this.#swingAttributeId = attributeExists ? context.data.system.swing.attributeId : null;
+    #cacheSwing(context) {
+        const swingAttribute = context.attributes.find((attribute) => attribute._id == context.data.system.swing.attributeId);
+        this.#swingAttribute = swingAttribute ?? null;
+        this.#swingValue = swingAttribute ? context.data.system.swing.value : 0;
     }
 
     /** @inheritdoc */
@@ -81,16 +82,11 @@ export default class CharacterSheet extends ActorSheet {
     * @private
     */
     #updateSwingControls() {
-        this.form.querySelector(".swing-attribute-selector").value = this.#swingAttributeId;
+        this.form.querySelector(".swing-attribute-selector").value = this.#swingAttribute?._id ?? null;
 
         const swingValueInput = this.form.querySelector(".swing-value");
-        if (this.#swingAttributeId === null) {
-            swingValueInput.style.display = "none";
-            swingValueInput.value = 0;
-        }
-        else {
-            swingValueInput.style.display = "flex";
-        }
+        swingValueInput.style.display = this.#swingAttribute ? "flex" : "none";
+        swingValueInput.value = this.#swingValue;
     }
 
     /**
@@ -149,12 +145,25 @@ export default class CharacterSheet extends ActorSheet {
         let d6Roll = new Roll("1d6");
         await d6Roll.evaluate();
 
-        const template = "systems/sentiment/templates/rolls/roll-to-do.html";
-        const html = await renderTemplate(template, {
-            d20Roll: d20Roll,
-            d6Roll: d6Roll,
-            total: d20Roll.total + d6Roll.total
-        });
+        let templatePath = "systems/sentiment/templates/rolls/";
+        let templateValues = {
+            d20Roll: d20Roll.total,
+            total: d20Roll.total
+        };
+
+        if (this.#swingAttribute === null) {
+            templatePath += "roll-to-do-wild.html";
+            templateValues.d6Roll = d6Roll.total;
+            templateValues.total += d6Roll.total;
+        }
+        else {
+            templatePath += "roll-to-do-swing.html";
+            templateValues.swingValue = this.#swingValue;
+            templateValues.swingAttribute = this.#swingAttribute.name;
+            templateValues.total += this.#swingValue;
+        }
+
+        const html = await renderTemplate(templatePath, templateValues);
 
         let message = {
             speaker: {
