@@ -83,6 +83,7 @@ export default class CharacterSheet extends ActorSheet {
 
         html.find(".attribute-add").click(this.#onAttributeAdd.bind(this));
         html.find(".attribute-delete").click(this.#onAttributeDelete.bind(this));
+        html.find(".drop-swing").click(this.#onDropSwing.bind(this));
         html.find(".roll-to-do").click(this.#onRollToDo.bind(this));
         html.find(".roll-to-dye").click(this.#onRollToDye.bind(this));
     }
@@ -139,6 +140,27 @@ export default class CharacterSheet extends ActorSheet {
         const listItem = $(event.currentTarget).parents(".attribute");
         const attribute = this.actor.items.get(listItem.data("itemId"));
         attribute.delete();
+    }
+
+    /**
+    * Handle event when the user drop's the character's swing.
+    * @param event
+    * @private
+    */
+    #onDropSwing(event) {
+        event.preventDefault();
+
+        if (this.#swingAttribute === null) {
+            return;
+        }
+
+        this.object.update({
+            "system.swing.attributeId": null,
+            "system.swing.value": 0
+        });
+
+        const templatePath = "systems/sentiment/templates/rolls/drop-swing.html";
+        this.#renderToChatMessage(templatePath, {});
     }
 
     /**
