@@ -22,6 +22,12 @@
                     <h4 class="attribute-name">{{attribute.name}}</h4>
                     <p class="attribute-color">{{attribute.system.color}}</p>
                     <p class="attribute-modifier">{{attribute.system.modifier}}</p>
+                    <p class="attribute-status">{{attribute.statusString}}</p>
+                    <div class="attribute-status-controls">
+                        {{#if attribute.displayRestoreButton}}<button class="button attribute-restore" type="button" title="Restore">Restore</button>{{/if}}
+                        {{#if attribute.displayLockOutButton}}<button class="button attribute-lock-out" type="button" title="Lock Out">Lock Out</button>{{/if}}
+                        {{#if attribute.displayWoundButton}}<button class="button attribute-wound" type="button" title="Wound">Wound</button>{{/if}}
+                    </div>
                     <div class="attribute-controls">
                         <a class="attribute-control attribute-open" title="Open Attribute"> <i class="fas fa-edit"></i> Open</a>
                         <a class="attribute-control attribute-delete" title="Delete Attribute"> <i class="fas fa-trash"></i> Delete</a>

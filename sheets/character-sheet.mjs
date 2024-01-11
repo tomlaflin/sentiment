@@ -1,3 +1,5 @@
+import AttributeStatus from "../enums.mjs";
+
 export default class CharacterSheet extends ActorSheet {
 
     #attributes;
@@ -19,6 +21,7 @@ export default class CharacterSheet extends ActorSheet {
 
         await this.#populateDescription(context);
         this.#populateAttributes(context);
+        this.#populateAttributeStatusProperties(context);
         this.#cacheSwing(context);
 
         return context;
@@ -53,6 +56,38 @@ export default class CharacterSheet extends ActorSheet {
     }
 
     /**
+      * Iterate all owned items and embed a collection containing only the attributes into the context for easy access.
+      * @param context
+      * @private
+      */
+    #populateAttributeStatusProperties(context) {
+        for (let attribute of context.attributes) {
+            switch (attribute.system.status) {
+                case AttributeStatus.Normal:
+                    attribute.statusString = "";
+                    attribute.displayRestoreButton = false;
+                    attribute.displayLockOutButton = true;
+                    attribute.displayWoundButton = true;
+                    break;
+                case AttributeStatus.LockedOut:
+                    attribute.statusString = "Lockout";
+                    attribute.displayRestoreButton = true;
+                    attribute.displayLockOutButton = false;
+                    attribute.displayWoundButton = true;
+                    break;
+                case AttributeStatus.Wounded:
+                    attribute.statusString = "Wounded";
+                    attribute.displayRestoreButton = true;
+                    attribute.displayLockOutButton = false;
+                    attribute.displayWoundButton = false;
+                    break;
+                default:
+                    throw new Error("Unknown AttributeStatus in attribute with ID " + attribute._id);
+            }
+        }
+    }
+
+    /**
     * Find the properties associated with the character's current swing, if any, and cache them for reference after the form is rendered.
     * @param context
     * @private
@@ -81,6 +116,9 @@ export default class CharacterSheet extends ActorSheet {
             return;
         }
 
+        html.find('.attribute-restore').click(this.#onAttributeRestore.bind(this));
+        html.find('.attribute-lock-out').click(this.#onAttributeLockOut.bind(this));
+        html.find('.attribute-wound').click(this.#onAttributeWound.bind(this));
         html.find(".attribute-add").click(this.#onAttributeAdd.bind(this));
         html.find(".attribute-delete").click(this.#onAttributeDelete.bind(this));
         html.find(".drop-swing").click(this.#onDropSwing.bind(this));
@@ -98,6 +136,46 @@ export default class CharacterSheet extends ActorSheet {
         const swingValueInput = this.form.querySelector(".swing-value");
         swingValueInput.style.display = this.#swingAttribute ? "flex" : "none";
         swingValueInput.value = this.#swingValue;
+    }
+
+    /**
+    * Handle event when the user restores an attribute from being locked out or wounded.
+    * @param event
+    * @private
+    */
+    async #onAttributeRestore(event) {
+        this.#onAttributeStatusEvent(event, AttributeStatus.Normal);
+    }
+
+    /**
+    * Handle event when the user locks out an attribute.
+    * @param event
+    * @private
+    */
+    async #onAttributeLockOut(event) {
+        this.#onAttributeStatusEvent(event, AttributeStatus.LockedOut);
+    }
+    /**
+    * Handle event when the user wounds an attribute.
+    * @param event
+    * @private
+    */
+    async #onAttributeWound(event) {
+        this.#onAttributeStatusEvent(event, AttributeStatus.Wounded);
+    }
+
+    /**
+    * Handle event that requires updating an attribute's status.
+    * @param event
+    * @param newAttributeStatus
+    * @private
+    */
+    async #onAttributeStatusEvent(event, newAttributeStatus) {
+        event.preventDefault();
+
+        const listItem = $(event.currentTarget).parents(".attribute");
+        const attribute = this.actor.items.get(listItem.data("itemId"));
+        attribute.update({ "system.status": newAttributeStatus });
     }
 
     /**

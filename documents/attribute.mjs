@@ -1,3 +1,5 @@
+import AttributeStatus from "../enums.mjs";
+
 export default class AttributeData extends foundry.abstract.DataModel {
     static defineSchema() {
         return {
@@ -11,7 +13,11 @@ export default class AttributeData extends foundry.abstract.DataModel {
                 integer: true,
                 initial: 0,
                 min: 0
-            })
+            }),
+            status: new foundry.data.fields.NumberField({
+                integer: true,
+                initial: AttributeStatus.Normal
+            }),
         };
     }
 }
