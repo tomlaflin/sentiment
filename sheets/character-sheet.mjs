@@ -89,7 +89,6 @@ export default class CharacterSheet extends ActorSheet {
 
     /**
     * Set value and display for the swing controls based on the cached swingAttributeId.
-    * @param context
     * @private
     */
     #updateSwingControls() {
@@ -150,12 +149,7 @@ export default class CharacterSheet extends ActorSheet {
     async #onRollToDo(event) {
         event.preventDefault();
 
-        let d20Roll = new Roll("1d20");
-        await d20Roll.evaluate();
-
-        let d6Roll = new Roll("1d6");
-        await d6Roll.evaluate();
-
+        const d20Roll = await new Roll("1d20").evaluate();
         let templatePath = "systems/sentiment/templates/rolls/";
         let templateValues = {
             d20Roll: d20Roll.total,
@@ -164,6 +158,8 @@ export default class CharacterSheet extends ActorSheet {
 
         if (this.#swingAttribute === null) {
             templatePath += "roll-to-do-wild.html";
+
+            const d6Roll = await new Roll("1d6").evaluate();
             templateValues.d6Roll = d6Roll.total;
             templateValues.total += d6Roll.total;
         }
@@ -178,31 +174,9 @@ export default class CharacterSheet extends ActorSheet {
     }
 
     /**
-    * Handle event when the user performs a Roll to Do.
-    * @param event
-    * @private
-    */
-    async #onRollToDye(event) {
-        event.preventDefault();
-
-        let attributeDice = [];
-
-        for (let attribute of this.#attributes) {
-            let d6Roll = new Roll("1d6");
-            await d6Roll.evaluate();
-            attributeDice.push({
-                attribute: attribute,
-                roll: d6Roll.total
-            });
-        }
-
-        const templatePath = "systems/sentiment/templates/rolls/roll-to-dye-dice.html";
-        this.#renderToChatMessage(templatePath, { attributeDice: attributeDice });
-    }
-
-    /**
     * Render an HTML template with arguments as a chat message with this character as the speaker.
-    * @param event
+    * @param templatePath
+    * @param args
     * @private
     */
     async #renderToChatMessage(templatePath, args) {
@@ -214,6 +188,129 @@ export default class CharacterSheet extends ActorSheet {
             content: html
         };
 
-        ChatMessage.create(message);
+        return ChatMessage.create(message);
+    }
+
+    /**
+    * Handle event when the user performs a Roll to Dye.
+    * @param event
+    * @private
+    */
+    async #onRollToDye(event) {
+        event.preventDefault();
+        
+        const existingSwingAttributeDie = this.#swingAttribute ? {
+            attribute: this.#swingAttribute,
+            roll: this.#swingValue - this.#swingAttribute.system.modifier,
+            existing: true
+        } : null;
+
+        const attributeDice = await this.#rollAttributeDice(existingSwingAttributeDie);
+        await this.#renderAttributeDice(attributeDice);
+
+        const chosenAttributeDie = await this.#renderChooseSwingDialog(attributeDice);
+        if (chosenAttributeDie != null) {
+            this.object.update({
+                "system.swing.attributeId": chosenAttributeDie.attribute._id,
+                "system.swing.value": chosenAttributeDie.roll + chosenAttributeDie.attribute.system.modifier
+            });
+        }
+
+        const newSwingAttributeDie = chosenAttributeDie ?? existingSwingAttributeDie;
+        
+        let rollToDyeTotal = attributeDice.reduce((total, attributeDie) => total + attributeDie.roll, 0);
+        rollToDyeTotal += newSwingAttributeDie?.attribute.system.modifier ?? 0;
+
+        this.#renderRollToDyeResult(rollToDyeTotal, newSwingAttributeDie);  
+    }
+
+    /**
+    * Roll a d6 associated with each of the character's attributes. The character's existing swing attribute, if any, is retained at its current value.
+    * @param swingAttributeDie
+    * @private
+    */
+    async #rollAttributeDice(swingAttributeDie) {
+        let attributeDice = [];
+
+        for (let attribute of this.#attributes) {
+            if (attribute._id == swingAttributeDie?.attribute._id) {
+                attributeDice.push(swingAttributeDie);
+            }
+            else {
+                const d6Roll = await new Roll("1d6").evaluate();
+                attributeDice.push({
+                    attribute: attribute,
+                    roll: d6Roll.total,
+                    existing: false
+                });
+            }
+        }
+
+        return attributeDice;
+    }
+
+    /**
+    * Render a chat message announcing the character's rolls on their attribute dice.
+    * @param attributeDice
+    * @private
+    */
+    async #renderAttributeDice(attributeDice) {
+        const templatePath = "systems/sentiment/templates/rolls/roll-to-dye-dice.html";
+        return this.#renderToChatMessage(templatePath, { attributeDice: attributeDice });
+    }
+
+    /**
+    * Render a dialog allowing the user to choose a new swing for the character based on the results of their Roll to Dye.
+    * @param attributeDice
+    * @private
+    */
+    async #renderChooseSwingDialog(attributeDice) {
+        const contentTemplatePath = "systems/sentiment/templates/rolls/roll-to-dye-choose-swing.html";
+        const content = await renderTemplate(contentTemplatePath, {});
+        
+        return new Promise((resolve, reject) => {
+            let buttons = {};
+
+            for (let attributeDie of attributeDice) {
+                const swingValue = attributeDie.roll + attributeDie.attribute.system.modifier;
+                buttons[attributeDie.attribute._id] = {
+                    label: attributeDie.attribute.name + ": " + swingValue,
+                    callback: () => { resolve(attributeDie) }
+                }
+            }
+
+            const chooseSwingDialog = {
+                title: "Roll To Dye",
+                content: content,
+                buttons: buttons,
+                close: () => { resolve(null) }
+            };
+
+            new Dialog(chooseSwingDialog).render(true);
+        });
+    }
+
+    /**
+    * Render a chat message announcing the final result of the character's Roll to Dye including their chosen swing, if any.
+    * @param total
+    * @param swingAttributeDie
+    * @private
+    */
+    async #renderRollToDyeResult(total, swingAttributeDie) {
+        let templatePath = "systems/sentiment/templates/rolls/";
+        let templateValues = {
+            total: total
+        };
+
+        if (swingAttributeDie === null) {
+            templatePath += "roll-to-dye-result-no-swing.html";
+        }
+        else {
+            templatePath += "roll-to-dye-result-swing.html";
+            templateValues.swingAttributeName = swingAttributeDie.attribute.name;
+            templateValues.swingValue = swingAttributeDie.roll + swingAttributeDie.attribute.system.modifier;
+        }
+        
+        this.#renderToChatMessage(templatePath, templateValues);
     }
 }
