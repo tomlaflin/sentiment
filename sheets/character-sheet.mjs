@@ -344,9 +344,9 @@ export default class CharacterSheet extends ActorSheet {
         await this.#renderAttributeDice(attributeDice);
 
         const availableAttributeDice = attributeDice.filter((attributeDie) => attributeDie.attribute.system.status == AttributeStatus.Normal);
-        console.log(availableAttributeDice);
-        const chosenAttributeDie = availableAttributeDice.length > 0 ? await this.#renderChooseSwingDialog(availableAttributeDice) : null;
+        this.#releaseAttributesFromLockout();
 
+        const chosenAttributeDie = availableAttributeDice.length > 0 ? await this.#renderChooseSwingDialog(availableAttributeDice) : null;
         if (chosenAttributeDie != null) {
             this.object.update({
                 "system.swing.attributeId": chosenAttributeDie.attribute._id,
@@ -370,7 +370,7 @@ export default class CharacterSheet extends ActorSheet {
     async #rollAttributeDice(swingAttributeDie) {
         let attributeDice = [];
 
-        for (let attribute of this.#attributes) {
+        for (const attribute of this.#attributes) {
             if (attribute._id == swingAttributeDie?.attribute._id) {
                 attributeDice.push(swingAttributeDie);
             }
@@ -395,6 +395,18 @@ export default class CharacterSheet extends ActorSheet {
     async #renderAttributeDice(attributeDice) {
         const templatePath = "systems/sentiment/templates/rolls/roll-to-dye-dice.html";
         return this.#renderToChatMessage(templatePath, { attributeDice: attributeDice });
+    }
+
+    /**
+    * Restore all locked-out attributes to normal status.
+    * @private
+    */
+    #releaseAttributesFromLockout() {
+        for (const attribute of this.#attributes) {
+            if (attribute.system.status == AttributeStatus.LockedOut) {
+                this.actor.items.get(attribute._id).update({ "system.status": AttributeStatus.Normal });
+            }
+        }   
     }
 
     /**
