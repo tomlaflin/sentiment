@@ -1,7 +1,16 @@
 <h3>Roll to Dye!</h3>
 {{#each attributeDice as |attributeDie|}}
 <p>
-    {{attributeDie.attribute.name}}: {{attributeDie.roll}} (+{{attributeDie.attribute.system.modifier}})
+    {{attributeDie.attribute.name}}:
+    {{#if (isStatusNormal attributeDie.attribute)}}
+        {{attributeDie.roll}} (+{{attributeDie.attribute.system.modifier}})
+    {{/if}}
+    {{#if (isStatusLockedOut attributeDie.attribute)}}
+        Locked Out
+    {{/if}}
+    {{#if (isStatusWounded attributeDie.attribute)}}
+        Wounded
+    {{/if}}
     {{#if attributeDie.existing}} (Existing Swing){{/if}}
 </p>
 {{/each}}

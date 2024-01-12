@@ -14,4 +14,6 @@ Hooks.once("init", async function () {
     Items.registerSheet("sentiment", AttributeSheet, { makeDefault: true });
     Actors.unregisterSheet("core", ActorSheet);
     Actors.registerSheet("sentiment", CharacterSheet, { makeDefault: true });
+
+    CharacterSheet.RegisterHandlebarsHelpers();
 });

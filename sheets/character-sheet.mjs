@@ -6,6 +6,20 @@ export default class CharacterSheet extends ActorSheet {
     #swingAttribute;
     #swingValue;
 
+    static RegisterHandlebarsHelpers() {
+        Handlebars.registerHelper('isStatusNormal', function (attribute) {
+            return attribute.system.status == AttributeStatus.Normal;
+        });
+
+        Handlebars.registerHelper('isStatusLockedOut', function (attribute) {
+            return attribute.system.status == AttributeStatus.LockedOut;
+        });
+
+        Handlebars.registerHelper('isStatusWounded', function (attribute) {
+            return attribute.system.status == AttributeStatus.Wounded;
+        });
+    }
+
     /** @inheritdoc */
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
@@ -144,7 +158,10 @@ export default class CharacterSheet extends ActorSheet {
     * @private
     */
     async #onAttributeRestore(event) {
-        this.#onAttributeStatusEvent(event, AttributeStatus.Normal);
+        event.preventDefault();
+
+        const attribute = this.#getAttributeFromAttributeListEvent(event);
+        attribute.update({ "system.status": AttributeStatus.Normal });
     }
 
     /**
@@ -153,29 +170,30 @@ export default class CharacterSheet extends ActorSheet {
     * @private
     */
     async #onAttributeLockOut(event) {
-        this.#onAttributeStatusEvent(event, AttributeStatus.LockedOut);
+        event.preventDefault();
+        
+        const attribute = this.#getAttributeFromAttributeListEvent(event);
+        attribute.update({ "system.status": AttributeStatus.LockedOut });
+
+        if (attribute._id === this.#swingAttribute?._id) {
+            this.#removeSwing();
+        }
     }
+
     /**
     * Handle event when the user wounds an attribute.
     * @param event
     * @private
     */
     async #onAttributeWound(event) {
-        this.#onAttributeStatusEvent(event, AttributeStatus.Wounded);
-    }
-
-    /**
-    * Handle event that requires updating an attribute's status.
-    * @param event
-    * @param newAttributeStatus
-    * @private
-    */
-    async #onAttributeStatusEvent(event, newAttributeStatus) {
         event.preventDefault();
 
-        const listItem = $(event.currentTarget).parents(".attribute");
-        const attribute = this.actor.items.get(listItem.data("itemId"));
-        attribute.update({ "system.status": newAttributeStatus });
+        const attribute = this.#getAttributeFromAttributeListEvent(event);
+        attribute.update({ "system.status": AttributeStatus.Wounded });
+
+        if (attribute._id === this.#swingAttribute?._id) {
+            this.#removeSwing();
+        }
     }
 
     /**
@@ -202,8 +220,7 @@ export default class CharacterSheet extends ActorSheet {
     #onAttributeOpen(event) {
         event.preventDefault();
         
-        const listItem = $(event.currentTarget).parents(".attribute");
-        const attribute = this.actor.items.get(listItem.data("itemId"));
+        const attribute = this.#getAttributeFromAttributeListEvent(event);
         attribute.sheet.render(true);
     }
 
@@ -215,13 +232,23 @@ export default class CharacterSheet extends ActorSheet {
     #onAttributeDelete(event) {
         event.preventDefault();
         
-        const listItem = $(event.currentTarget).parents(".attribute");
-        const attribute = this.actor.items.get(listItem.data("itemId"));
+        const attribute = this.#getAttributeFromAttributeListEvent(event);
         attribute.delete();
     }
 
     /**
-    * Handle event when the user drop's the character's swing.
+     * Get the attribute associated with an event emitted from the attribute list.
+     * @param event
+     * @private
+     */
+    #getAttributeFromAttributeListEvent(event) {
+        const listItem = $(event.currentTarget).parents(".attribute");
+        const attribute = this.actor.items.get(listItem.data("itemId"));
+        return attribute;
+    }
+
+    /**
+    * Handle event when the user drops the character's swing.
     * @param event
     * @private
     */
@@ -232,6 +259,14 @@ export default class CharacterSheet extends ActorSheet {
             return;
         }
 
+        this.#removeSwing();
+    }
+
+    /**
+    * Remove character's swing and send a notification in chat.
+    * @private
+    */
+    #removeSwing() {
         this.object.update({
             "system.swing.attributeId": null,
             "system.swing.value": 0
@@ -308,7 +343,10 @@ export default class CharacterSheet extends ActorSheet {
         const attributeDice = await this.#rollAttributeDice(existingSwingAttributeDie);
         await this.#renderAttributeDice(attributeDice);
 
-        const chosenAttributeDie = await this.#renderChooseSwingDialog(attributeDice);
+        const availableAttributeDice = attributeDice.filter((attributeDie) => attributeDie.attribute.system.status == AttributeStatus.Normal);
+        console.log(availableAttributeDice);
+        const chosenAttributeDie = availableAttributeDice.length > 0 ? await this.#renderChooseSwingDialog(availableAttributeDice) : null;
+
         if (chosenAttributeDie != null) {
             this.object.update({
                 "system.swing.attributeId": chosenAttributeDie.attribute._id,
@@ -318,10 +356,10 @@ export default class CharacterSheet extends ActorSheet {
 
         const newSwingAttributeDie = chosenAttributeDie ?? existingSwingAttributeDie;
         
-        let rollToDyeTotal = attributeDice.reduce((total, attributeDie) => total + attributeDie.roll, 0);
+        let rollToDyeTotal = availableAttributeDice.reduce((total, attributeDie) => total + attributeDie.roll, 0);
         rollToDyeTotal += newSwingAttributeDie?.attribute.system.modifier ?? 0;
 
-        this.#renderRollToDyeResult(rollToDyeTotal, newSwingAttributeDie);  
+        this.#renderRollToDyeResult(rollToDyeTotal, newSwingAttributeDie);
     }
 
     /**
