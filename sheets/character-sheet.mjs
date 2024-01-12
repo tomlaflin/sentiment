@@ -291,21 +291,70 @@ export default class CharacterSheet extends ActorSheet {
             total: d20Roll.total
         };
 
-        if (this.#swingAttribute === null) {
-            templatePath += "roll-to-do-wild.html";
-
-            const d6Roll = await new Roll("1d6").evaluate();
-            templateValues.d6Roll = d6Roll.total;
-            templateValues.total += d6Roll.total;
-        }
-        else {
+        if (this.#swingAttribute !== null) {
             templatePath += "roll-to-do-swing.html";
+
             templateValues.swingValue = this.#swingValue;
             templateValues.swingAttribute = this.#swingAttribute.name;
             templateValues.total += this.#swingValue;
         }
+        else {
+            templatePath += "roll-to-do-no-swing.html";
+
+            const d6Roll = await new Roll("1d6").evaluate();
+            templateValues.d6Roll = d6Roll.total;
+            templateValues.total += d6Roll.total;
+
+            let dialogCanceled = false;
+            const chosenAttribute = await this.#renderRollToDoChooseAttributeDialog().catch(() => {
+                dialogCanceled = true;
+            });
+
+            if (dialogCanceled) {
+                return;
+            }
+
+            templateValues.attribute = chosenAttribute;
+            templateValues.total += chosenAttribute?.system.modifier ?? 0;
+        }
 
         this.#renderToChatMessage(templatePath, templateValues);
+    }
+
+    /**
+    * Render a dialog allowing the user to choose which attribute they wish to use for a Roll to Do.
+    * @private
+    */
+    async #renderRollToDoChooseAttributeDialog() {
+        const contentTemplatePath = "systems/sentiment/templates/rolls/roll-to-do-choose-attribute.html";
+        const content = await renderTemplate(contentTemplatePath, {});
+
+        return new Promise((resolve, reject) => {
+            let buttons = {};
+
+            for (const attribute of this.#attributes) {
+                if (attribute.system.status == AttributeStatus.Normal) {
+                    buttons[attribute._id] = {
+                        label: attribute.name + " (+" + attribute.system.modifier + ")",
+                        callback: () => { resolve(attribute) }
+                    }
+                }
+            }
+
+            buttons.wild = {
+                label: "Wild",
+                callback: () => { resolve(null) }
+            }
+
+            const chooseAttributeDialog = {
+                title: "Roll To Do",
+                content: content,
+                buttons: buttons,
+                close: () => { reject() }
+            };
+
+            new Dialog(chooseAttributeDialog).render(true);
+        });
     }
 
     /**

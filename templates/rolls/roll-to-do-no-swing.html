@@ -1,4 +1,7 @@
 <h3>Roll to Do!</h3>
 <p>d20 Roll: {{d20Roll}}</p>
 <p>d6 Roll: {{d6Roll}}</p>
+{{#if attribute}}
+<p>Modifier: +{{attribute.system.modifier}} ({{attribute.name}})</p>
+{{/if}}
 <p>Total: {{total}}</p>
