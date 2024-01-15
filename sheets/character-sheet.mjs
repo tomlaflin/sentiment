@@ -405,7 +405,12 @@ export default class CharacterSheet extends ActorSheet {
             totalStrategy: this.#totalAllAttributeRollsAndModifiers,
         }
 
-        this.#executeRollToDye(rollToDyeOptions);
+        const rollToDyeTotal = await this.#executeRollToDye(rollToDyeOptions);
+        const newHealth = Math.min(this.object.system.health.value + rollToDyeTotal, this.object.system.health.max);
+
+        this.object.update({
+            "system.health.value": newHealth
+        });
     }
 
     /**
@@ -437,6 +442,8 @@ export default class CharacterSheet extends ActorSheet {
         const newSwingAttributeDie = chosenAttributeDie ?? existingSwingAttributeDie;
         const rollToDyeTotal = rollToDyeOptions.totalStrategy(availableAttributeDice, newSwingAttributeDie);
         this.#renderRollToDyeResult(rollToDyeOptions.rollTitle, rollToDyeTotal, newSwingAttributeDie);
+
+        return rollToDyeTotal;
     }
 
     /**
