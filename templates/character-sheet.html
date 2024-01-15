@@ -1,7 +1,29 @@
 <form class="{{cssClass}}" autocomplete="off">
     <header class="sheet-header">
-        <img src="{{data.img}}" data-edit="img" title="{{data.name}}" />
-        <h1><input name="name" type="text" value="{{data.name}}" placeholder="Name" /></h1>
+        <img class="character-image" src="{{data.img}}" data-edit="img" title="{{data.name}}" />
+        <div class="header-fields">
+            <h1 class="character-name-header">
+                <input class="character-name" name="name" type="text" value="{{data.name}}" placeholder="Name" />
+            </h1>
+            <div class="header-row">
+                <div class="header-field-stack health-stack">
+                    <label>Health:</label>
+                    <div class="health-bar">
+                        <input type="number" name="system.health.value" value="{{data.system.health.value}}" />
+                        <span> / </span>
+                        <input type="number" name="system.health.max" value="{{data.system.health.max}}" />
+                    </div>
+                </div>
+                <div class="header-field-stack speed-stack">
+                    <label>Speed:</label>
+                    <input type="number" name="system.speed" value="{{data.system.speed}}" />
+                </div>
+                <div class="header-field-stack experience-stack">
+                    <label>Experience:</label>
+                    <input type="number" name="system.experience" value="{{data.system.experience}}" />
+                </div>
+            </div>
+        </div>
     </header>
 
     <nav class="sheet-tabs tabs" data-group="primary">
