@@ -26,6 +26,7 @@ export default class CharacterSheet extends ActorSheet {
             classes: ["sentiment", "sheet"],
             template: "systems/sentiment/templates/character-sheet.html",
             tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "description" }],
+            dragDrop: [{ dragSelector: ".attribute-list .attribute", dropSelector: null }]
         });
     }
     
