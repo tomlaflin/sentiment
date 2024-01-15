@@ -29,6 +29,7 @@
     <nav class="sheet-tabs tabs" data-group="primary">
         <a class="item" data-tab="description">Description</a>
         <a class="item" data-tab="attributes">Attributes</a>
+        <a class="item" data-tab="gifts">Gifts</a>
     </nav>
 
     <section class="sheet-body">
@@ -37,10 +38,10 @@
         </div>
 
         <div class="tab attributes" data-group="primary" data-tab="attributes">
-            <ol class="attribute-list">
+            <ol class="list attribute-list">
                 {{#each attributes as |attribute id|}}
-                <li class="attribute flexrow" data-item-id="{{attribute._id}}">
-                    <img class="attribute-image" src="{{attribute.img}}" title="{{attribute.name}}" />
+                <li class="attribute list-item flexrow" data-item-id="{{attribute._id}}">
+                    <img class="list-image attribute-image" src="{{attribute.img}}" title="{{attribute.name}}" />
                     <h4 class="attribute-name">{{attribute.name}}</h4>
                     <p class="attribute-color">{{attribute.system.color}}</p>
                     <p class="attribute-modifier">{{attribute.system.modifier}}</p>
@@ -77,6 +78,23 @@
             <p><button class="button roll-to-do" type="button" title="Roll to Do">Roll to Do</button></p>
             <p><button class="button roll-to-dye" type="button" title="Roll to Dye">Roll to Dye</button></p>
             <p><button class="button recovery-roll" type="button" title="Recovery Roll">Recovery Roll</button></p>
+        </div>
+        <div class="tab gifts" data-group="primary" data-tab="gifts">
+            <ol class="list gift-list">
+                {{#each gifts as |gift id|}}
+                <li class="gift list-item flexrow" data-item-id="{{gift._id}}">
+                    <img class="list-image gift-image" src="{{gift.img}}" title="{{gift.name}}" />
+                    <h4 class="gift-name">{{gift.name}}</h4>
+                    <div class="gift-controls">
+                        <a class="gift-control gift-open" title="Open Gift"> <i class="fas fa-edit"></i> Open</a>
+                        <a class="gift-control gift-delete" title="Delete Gift"> <i class="fas fa-trash"></i> Delete</a>
+                    </div>
+                </li>
+                {{/each}}
+            </ol>
+            <p>
+                <a class="gift-control gift-add" title="Add New Gift"><i class="fas fa-plus"></i> Add New Gift</a>
+            </p>
         </div>
     </section>
 </form>

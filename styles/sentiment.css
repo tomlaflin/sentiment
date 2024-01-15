@@ -79,14 +79,14 @@
 	height: 100%;
 }
 
-.sentiment .attribute-list {
+.sentiment .list {
 	list-style: none;
 	margin: 7px 0;
 	padding: 0;
 	overflow-y: auto;
 }
 
-.sentiment .attribute-list .attribute {
+.sentiment .list .list-item {
 	min-height: 30px;
 	line-height: 24px;
 	padding: 3px 0;
@@ -94,7 +94,7 @@
 	align-items: stretch;
 }
 
-.sentiment .attribute-list .attribute .attribute-image {
+.sentiment .list .list-item .list-image {
 	width: 24px;
 	height: 24px;
 	flex: 0 0 24px;

@@ -26,7 +26,10 @@ export default class CharacterSheet extends ActorSheet {
             classes: ["sentiment", "sheet"],
             template: "systems/sentiment/templates/character-sheet.html",
             tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "description" }],
-            dragDrop: [{ dragSelector: ".attribute-list .attribute", dropSelector: null }]
+            dragDrop: [
+                { dragSelector: ".attribute-list .attribute", dropSelector: null },
+                { dragSelector: ".gift-list .gift", dropSelector: null }
+            ]
         });
     }
     
@@ -37,6 +40,7 @@ export default class CharacterSheet extends ActorSheet {
         await this.#populateDescription(context);
         this.#populateAttributes(context);
         this.#populateAttributeStatusProperties(context);
+        this.#populateGifts(context);
         this.#cacheSwing(context);
 
         return context;
@@ -71,7 +75,7 @@ export default class CharacterSheet extends ActorSheet {
     }
 
     /**
-      * Iterate all owned items and embed a collection containing only the attributes into the context for easy access.
+      * Embed additional dervied data relating to the status of each attribute for easy access.
       * @param context
       * @private
       */
@@ -103,6 +107,21 @@ export default class CharacterSheet extends ActorSheet {
     }
 
     /**
+    * Iterate all owned items and embed a collection containing only the gifts into the context for easy access.
+    * @param context
+    * @private
+    */
+    #populateGifts(context) {
+        context.gifts = [];
+
+        for (let item of context.items) {
+            if (item.type == "gift") {
+                context.gifts.push(item);
+            }
+        }
+    }
+
+    /**
     * Find the properties associated with the character's current swing, if any, and cache them for reference after the form is rendered.
     * @param context
     * @private
@@ -126,6 +145,7 @@ export default class CharacterSheet extends ActorSheet {
 
         this.#updateSwingControls();
         html.find('.attribute-open').click(this.#onAttributeOpen.bind(this));
+        html.find('.gift-open').click(this.#onGiftOpen.bind(this));
 
         if (!this.isEditable) {
             return;
@@ -136,6 +156,8 @@ export default class CharacterSheet extends ActorSheet {
         html.find('.attribute-wound').click(this.#onAttributeWound.bind(this));
         html.find(".attribute-add").click(this.#onAttributeAdd.bind(this));
         html.find(".attribute-delete").click(this.#onAttributeDelete.bind(this));
+        html.find(".gift-add").click(this.#onGiftAdd.bind(this));
+        html.find(".gift-delete").click(this.#onGiftDelete.bind(this));
         html.find(".drop-swing").click(this.#onDropSwing.bind(this));
         html.find(".roll-to-do").click(this.#onRollToDo.bind(this));
         html.find(".roll-to-dye").click(this.#onRollToDye.bind(this));
@@ -162,7 +184,7 @@ export default class CharacterSheet extends ActorSheet {
     async #onAttributeRestore(event) {
         event.preventDefault();
 
-        const attribute = this.#getAttributeFromAttributeListEvent(event);
+        const attribute = this.#getItemFromListEvent(event);
         attribute.update({ "system.status": AttributeStatus.Normal });
     }
 
@@ -174,7 +196,7 @@ export default class CharacterSheet extends ActorSheet {
     async #onAttributeLockOut(event) {
         event.preventDefault();
         
-        const attribute = this.#getAttributeFromAttributeListEvent(event);
+        const attribute = this.#getItemFromListEvent(event);
         attribute.update({ "system.status": AttributeStatus.LockedOut });
 
         if (attribute._id === this.#swingAttribute?._id) {
@@ -190,7 +212,7 @@ export default class CharacterSheet extends ActorSheet {
     async #onAttributeWound(event) {
         event.preventDefault();
 
-        const attribute = this.#getAttributeFromAttributeListEvent(event);
+        const attribute = this.#getItemFromListEvent(event);
         attribute.update({ "system.status": AttributeStatus.Wounded });
 
         if (attribute._id === this.#swingAttribute?._id) {
@@ -205,12 +227,12 @@ export default class CharacterSheet extends ActorSheet {
     */
     async #onAttributeAdd(event) {
         event.preventDefault();
-        
+
         const itemData = {
             name: "New Attribute",
             type: "attribute",
         };
-        
+
         return await Item.create(itemData, { parent: this.actor });
     }
 
@@ -221,8 +243,8 @@ export default class CharacterSheet extends ActorSheet {
     */
     #onAttributeOpen(event) {
         event.preventDefault();
-        
-        const attribute = this.#getAttributeFromAttributeListEvent(event);
+
+        const attribute = this.#getItemFromListEvent(event);
         attribute.sheet.render(true);
     }
 
@@ -233,20 +255,60 @@ export default class CharacterSheet extends ActorSheet {
     */
     #onAttributeDelete(event) {
         event.preventDefault();
-        
-        const attribute = this.#getAttributeFromAttributeListEvent(event);
+
+        const attribute = this.#getItemFromListEvent(event);
         attribute.delete();
     }
 
     /**
-     * Get the attribute associated with an event emitted from the attribute list.
+    * Handle event when the user adds a gift.
+    * @param event
+    * @private
+    */
+    async #onGiftAdd(event) {
+        event.preventDefault();
+
+        const itemData = {
+            name: "New Gift",
+            type: "gift",
+        };
+
+        return await Item.create(itemData, { parent: this.actor });
+    }
+
+    /**
+    * Handle event when the user opens a gift.
+    * @param event
+    * @private
+    */
+    #onGiftOpen(event) {
+        event.preventDefault();
+
+        const gift = this.#getItemFromListEvent(event);
+        gift.sheet.render(true);
+    }
+
+    /**
+    * Handle event when the user deletes a gift.
+    * @param event
+    * @private
+    */
+    #onGiftDelete(event) {
+        event.preventDefault();
+
+        const gift = this.#getItemFromListEvent(event);
+        gift.delete();
+    }
+
+    /**
+     * Get the item associated with an event emitted from a list.
      * @param event
      * @private
      */
-    #getAttributeFromAttributeListEvent(event) {
-        const listItem = $(event.currentTarget).parents(".attribute");
-        const attribute = this.actor.items.get(listItem.data("itemId"));
-        return attribute;
+    #getItemFromListEvent(event) {
+        const listItem = $(event.currentTarget).parents(".list-item");
+        const item = this.actor.items.get(listItem.data("itemId"));
+        return item;
     }
 
     /**
