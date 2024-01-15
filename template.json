@@ -5,7 +5,7 @@
     "character": {}
   },
   "Item": {
-    "types": [ "attribute" ],
+    "types": [ "attribute", "gift" ],
     "htmlFields": [ "description" ],
     "attribute": {}
   }

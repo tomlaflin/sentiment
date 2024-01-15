@@ -73,6 +73,7 @@
 .sentiment .section .sheet-body,
 .sentiment .sheet-body .tab,
 .sentiment .sheet-body .tab .editor,
+.sentiment .sheet-body .description,
 .sentiment .editor,
 .sentiment .editor-content {
 	height: 100%;

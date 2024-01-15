@@ -1,0 +1,12 @@
+<form class="{{cssClass}}" autocomplete="off">
+    <header class="sheet-header">
+        <img src="{{data.img}}" data-edit="img" title="{{data.name}}" height="64" width="64" />
+        <h1><input name="name" type="text" value="{{data.name}}" placeholder="Name" /></h1>
+    </header>
+
+    <section class="sheet-body">
+        <div class="description" data-group="primary" data-tab="description">
+            {{editor descriptionHTML target="system.description" button=true owner=owner editable=editable engine="prosemirror"}}
+        </div>
+    </section>
+</form>
