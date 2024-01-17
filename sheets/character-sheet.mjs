@@ -8,6 +8,7 @@ export default class CharacterSheet extends ActorSheet {
     #attributes;
     #swingAttribute;
     #swingValue;
+    #gifts;
 
     static RegisterHandlebarsHelpers() {
         Handlebars.registerHelper('isStatusNormal', function (attribute) {
@@ -111,32 +112,26 @@ export default class CharacterSheet extends ActorSheet {
     }
 
     /**
-    * Iterate all owned items and embed a collection containing only the gifts into the context for easy access.
+    * Iterate all owned items and embed collections contain gifts of each different Equip Status into the context for easy access.
     * @param context
     * @private
     */
     #populateGifts(context) {
-        context.primaryGifts = [];
-        context.equippedGifts = [];
-        context.unequippedGifts = [];
+        this.#gifts = {
+            [GiftEquipStatus.Primary]: [],
+            [GiftEquipStatus.Equipped]: [],
+            [GiftEquipStatus.Unequipped]: [],
+        }
         
         for (let item of context.items) {
             if (item.type == "gift") {
-                switch (item.system.equipStatus) {
-                    case GiftEquipStatus.Primary:
-                        context.primaryGifts.push(item);
-                        break;
-                    case GiftEquipStatus.Equipped:
-                        context.equippedGifts.push(item);
-                        break;
-                    case GiftEquipStatus.Unequipped:
-                        context.unequippedGifts.push(item);
-                        break;
-                    default:
-                        throw new Error("Unknown GiftEquipStatus in gift with ID " + item._id);
-                }
+                this.#gifts[item.system.equipStatus].push(item);
             }
         }
+
+        context.primaryGifts = this.#gifts[GiftEquipStatus.Primary];
+        context.equippedGifts = this.#gifts[GiftEquipStatus.Equipped];
+        context.unequippedGifts = this.#gifts[GiftEquipStatus.Unequipped];
     }
 
     /**
@@ -356,13 +351,50 @@ export default class CharacterSheet extends ActorSheet {
         if (!droppedGift) {
             throw new Error("Dropped gift ID not found among the character's items.");
         }
+
+        const giftDroppedUpon = this.object.items.get(event.target.closest(".gift")?.dataset["itemId"]);
+        if (giftDroppedUpon && giftDroppedUpon._id == droppedGiftId) {
+            return;
+        }
         
         const giftEquipStatusFrom = droppedGift.system.equipStatus;
         const giftEquipStatusTo = Number(giftListContainerHtml.dataset["giftEquipStatus"]);
 
-        if (giftEquipStatusFrom != giftEquipStatusTo) {
-            droppedGift.update({ "system.equipStatus": giftEquipStatusTo }); 
+        let updates = {};
+
+        if (giftEquipStatusFrom !== giftEquipStatusTo) {
+            updates["system.equipStatus"] = giftEquipStatusTo;
         }
+
+        const destinationGiftList = this.#gifts[giftEquipStatusTo];
+        if (destinationGiftList.length > 0) {
+            let targetListIndex = 0;
+            
+            if (giftDroppedUpon) {
+                const movingToHigherList = giftEquipStatusFrom !== giftEquipStatusTo
+                    && (giftEquipStatusTo == GiftEquipStatus.Primary || giftEquipStatusFrom == GiftEquipStatus.Unequipped);
+
+                const movingUpWithinSameList = giftEquipStatusFrom === giftEquipStatusTo && droppedGift.sort > giftDroppedUpon.sort;
+
+                const giftDroppedUponListIndex = destinationGiftList.findIndex((item) => item._id === giftDroppedUpon._id);
+                targetListIndex = movingToHigherList || movingUpWithinSameList ? giftDroppedUponListIndex : giftDroppedUponListIndex + 1;
+            }
+
+            let newSortValue;
+            if (targetListIndex == 0) {
+                newSortValue = destinationGiftList[0].sort - 100000;
+            }
+            else if (targetListIndex == destinationGiftList.length) {
+                newSortValue = destinationGiftList[destinationGiftList.length - 1].sort + 100000;
+            }
+            else {
+                newSortValue = (destinationGiftList[targetListIndex].sort + destinationGiftList[targetListIndex - 1].sort) / 2;
+            }
+
+            updates["sort"] = newSortValue;
+        }
+
+        droppedGift.update(updates);
     }
 
     /**
