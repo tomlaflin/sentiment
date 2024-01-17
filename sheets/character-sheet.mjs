@@ -1,4 +1,7 @@
-import AttributeStatus from "../enums.mjs";
+import {
+    AttributeStatus,
+    GiftEquipStatus
+} from "../enums.mjs";
 
 export default class CharacterSheet extends ActorSheet {
 
@@ -42,6 +45,7 @@ export default class CharacterSheet extends ActorSheet {
         this.#populateAttributeStatusProperties(context);
         this.#populateGifts(context);
         this.#cacheSwing(context);
+        this.#populateGiftEquipStatus(context);
 
         return context;
     }
@@ -112,11 +116,25 @@ export default class CharacterSheet extends ActorSheet {
     * @private
     */
     #populateGifts(context) {
-        context.gifts = [];
-
+        context.primaryGifts = [];
+        context.equippedGifts = [];
+        context.unequippedGifts = [];
+        
         for (let item of context.items) {
             if (item.type == "gift") {
-                context.gifts.push(item);
+                switch (item.system.equipStatus) {
+                    case GiftEquipStatus.Primary:
+                        context.primaryGifts.push(item);
+                        break;
+                    case GiftEquipStatus.Equipped:
+                        context.equippedGifts.push(item);
+                        break;
+                    case GiftEquipStatus.Unequipped:
+                        context.unequippedGifts.push(item);
+                        break;
+                    default:
+                        throw new Error("Unknown GiftEquipStatus in gift with ID " + item._id);
+                }
             }
         }
     }
@@ -130,6 +148,15 @@ export default class CharacterSheet extends ActorSheet {
         const swingAttribute = context.attributes.find((attribute) => attribute._id == context.data.system.swing.attributeId);
         this.#swingAttribute = swingAttribute ?? null;
         this.#swingValue = swingAttribute ? context.data.system.swing.value : 0;
+    }
+
+    /**
+    * Embed the GiftEquipStatus enum in the context so its values can be referenced in Handlebars.
+    * @param context
+    * @private
+    */
+    async #populateGiftEquipStatus(context) {
+        context.GiftEquipStatus = GiftEquipStatus;
     }
 
     /** @inheritdoc */
@@ -298,6 +325,44 @@ export default class CharacterSheet extends ActorSheet {
 
         const gift = this.#getItemFromListEvent(event);
         gift.delete();
+    }
+
+    /** @inheritdoc */
+    _onDragStart(event) {
+        const draggedGiftHtml = event.target.closest(".gift");
+        if (draggedGiftHtml === null) {
+            return super._onDragStart(event);
+        }
+
+        const itemId = draggedGiftHtml.dataset["itemId"];
+        event.dataTransfer.setData("text/plain", JSON.stringify({ giftId: itemId }));
+    }
+
+    /** @inheritdoc */
+    _onDrop(event) {
+        const giftListContainerHtml = event.target.closest(".gift-list-container");
+
+        let droppedGiftId;
+        try {
+            const data = JSON.parse(event.dataTransfer.getData("text/plain"));
+            droppedGiftId = data.giftId;
+        } catch (err) { }
+
+        if (!giftListContainerHtml || !droppedGiftId) {
+            return super._onDrop(event);
+        }
+
+        const droppedGift = this.object.items.find((item) => item._id === droppedGiftId);
+        if (!droppedGift) {
+            throw new Error("Dropped gift ID not found among the character's items.");
+        }
+        
+        const giftEquipStatusFrom = droppedGift.system.equipStatus;
+        const giftEquipStatusTo = Number(giftListContainerHtml.dataset["giftEquipStatus"]);
+
+        if (giftEquipStatusFrom != giftEquipStatusTo) {
+            droppedGift.update({ "system.equipStatus": giftEquipStatusTo }); 
+        }
     }
 
     /**

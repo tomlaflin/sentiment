@@ -23,4 +23,6 @@ Hooks.once("init", async function () {
     Actors.registerSheet("sentiment", CharacterSheet, { makeDefault: true });
 
     CharacterSheet.RegisterHandlebarsHelpers();
+
+    await loadTemplates(["systems/sentiment/templates/partials/gift-list.html"]);
 });

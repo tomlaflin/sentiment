@@ -1,4 +1,4 @@
-import AttributeStatus from "../enums.mjs";
+import { AttributeStatus } from "../enums.mjs";
 
 export default class AttributeData extends foundry.abstract.DataModel {
     static defineSchema() {

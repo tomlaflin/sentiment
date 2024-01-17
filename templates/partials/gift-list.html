@@ -1,0 +1,15 @@
+<div class="gift-list-container" data-gift-equip-status={{equipStatus}}>
+    <h3>{{title}}:</h3>
+    <ol class="list gift-list">
+        {{#each gifts as |gift id|}}
+        <li class="gift gift-element list-item flexrow" data-item-id="{{gift._id}}">
+            <img class="list-image gift-image gift-element" src="{{gift.img}}" title="{{gift.name}}" />
+            <h4 class="gift-name gift-element">{{gift.name}}</h4>
+            <div class="gift-controls gift-element">
+                <a class="gift-control gift-open gift-element" title="Open Gift"> <i class="fas fa-edit"></i> Open</a>
+                <a class="gift-control gift-delete gift-element" title="Delete Gift"> <i class="fas fa-trash"></i> Delete</a>
+            </div>
+        </li>
+        {{/each}}
+    </ol>
+</div>

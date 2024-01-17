@@ -80,18 +80,9 @@
             <p><button class="button recovery-roll" type="button" title="Recovery Roll">Recovery Roll</button></p>
         </div>
         <div class="tab gifts" data-group="primary" data-tab="gifts">
-            <ol class="list gift-list">
-                {{#each gifts as |gift id|}}
-                <li class="gift list-item flexrow" data-item-id="{{gift._id}}">
-                    <img class="list-image gift-image" src="{{gift.img}}" title="{{gift.name}}" />
-                    <h4 class="gift-name">{{gift.name}}</h4>
-                    <div class="gift-controls">
-                        <a class="gift-control gift-open" title="Open Gift"> <i class="fas fa-edit"></i> Open</a>
-                        <a class="gift-control gift-delete" title="Delete Gift"> <i class="fas fa-trash"></i> Delete</a>
-                    </div>
-                </li>
-                {{/each}}
-            </ol>
+            {{> "systems/sentiment/templates/partials/gift-list.html" title="Primary" equipStatus=GiftEquipStatus.Primary gifts=primaryGifts}}
+            {{> "systems/sentiment/templates/partials/gift-list.html" title="Equipped" equipStatus=GiftEquipStatus.Equipped gifts=equippedGifts}}
+            {{> "systems/sentiment/templates/partials/gift-list.html" title="Unequipped" equipStatus=GiftEquipStatus.Unequipped gifts=unequippedGifts}}
             <p>
                 <a class="gift-control gift-add" title="Add New Gift"><i class="fas fa-plus"></i> Add New Gift</a>
             </p>
