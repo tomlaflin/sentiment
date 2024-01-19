@@ -58,12 +58,21 @@ export class Character extends Actor {
         const newSwingAttributeId = changed.system?.swing?.attributeId;
 
         if (newSwingAttributeId && this.system.swingTokenImages.enabled) {
-            const targetToken = this.isToken ? this.token : this.prototypeToken;
             const customTokenImagePath = newSwingAttributeId != AttributeIdNoSwing
                 ? this.items.find((item) => item._id === newSwingAttributeId).system.customTokenImagePath
                 : this.system.swingTokenImages.defaultTokenImagePath;
 
-            targetToken.update({ "texture.src": customTokenImagePath });
+            const targetTokens = [];
+
+            if (this.isToken) {
+                targetTokens.push(this.token);
+            }
+            else {
+                targetTokens.push(this.prototypeToken);
+                this.getDependentTokens().filter((token) => token.actorLink).forEach((token) => targetTokens.push(token));
+            }
+
+            targetTokens.forEach((token) => token.update({ "texture.src": customTokenImagePath }));
         }
 
         super._onUpdate(changed, options, userId);
