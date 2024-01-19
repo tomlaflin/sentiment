@@ -16,7 +16,7 @@ export default class AttributeSheet extends ItemSheet {
         const colorRGB = context.data.system.color;
         context.colorString = foundry.utils.Color.fromRGB(colorRGB).toString();
         
-        context.showCustomTokenImage = this.object.isEmbedded && this.object.parent.isToken;
+        context.showCustomTokenImage = this.object.isEmbedded;
 
         return context;
     }

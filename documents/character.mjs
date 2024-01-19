@@ -57,12 +57,13 @@ export class Character extends Actor {
     _onUpdate(changed, options, userId) {
         const newSwingAttributeId = changed.system?.swing?.attributeId;
 
-        if (newSwingAttributeId && this.system.swingTokenImages.enabled && this.isToken) {
+        if (newSwingAttributeId && this.system.swingTokenImages.enabled) {
+            const targetToken = this.isToken ? this.token : this.prototypeToken;
             const customTokenImagePath = newSwingAttributeId != AttributeIdNoSwing
                 ? this.items.find((item) => item._id === newSwingAttributeId).system.customTokenImagePath
                 : this.system.swingTokenImages.defaultTokenImagePath;
 
-            this.token.update({ "texture.src": customTokenImagePath });
+            targetToken.update({ "texture.src": customTokenImagePath });
         }
 
         super._onUpdate(changed, options, userId);

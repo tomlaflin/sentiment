@@ -62,16 +62,6 @@
                 <a class="attribute-control attribute-add" title="Add New Attribute"><i class="fas fa-plus"></i> Add New Attribute</a>
             </p>
             <hr class="solid"></hr>
-            {{#if showSwingTokenImageUI}}
-            <input type="checkbox" class="enable-swing-token-images" id="enable-swing-token-images" name="system.swingTokenImages.enabled" {{checked data.system.swingTokenImages.enabled}} />
-            <label for="enable-swing-token-images">Use Custom Token Images Per Swing</label>
-            {{#if data.system.swingTokenImages.enabled}}
-            <p>
-                <label class="custom-token-image-label" for="custom-token-image">Default Token (No Swing):</label>
-                <img class="custom-token-image" src="{{data.system.swingTokenImages.defaultTokenImagePath}}" data-edit="system.swingTokenImages.defaultTokenImagePath" height="100" width="100" />
-            </p>
-            {{/if}}
-            {{/if}}
             <p><label>Swing:</label></p>
             <p class="flexrow">
                 <select class="swing-attribute-selector" name="swing-attribute-selector">
@@ -88,6 +78,16 @@
             <p><button class="button roll-to-do" type="button" title="Roll to Do">Roll to Do</button></p>
             <p><button class="button roll-to-dye" type="button" title="Roll to Dye">Roll to Dye</button></p>
             <p><button class="button recovery-roll" type="button" title="Recovery Roll">Recovery Roll</button></p>
+            <p>
+                <input type="checkbox" class="enable-swing-token-images" id="enable-swing-token-images" name="system.swingTokenImages.enabled" {{checked data.system.swingTokenImages.enabled}} />
+                <label for="enable-swing-token-images">Use Custom Token Images Per Swing</label>
+                {{#if data.system.swingTokenImages.enabled}}
+                <p>
+                    <label class="custom-token-image-label" for="custom-token-image">Default Token (No Swing):</label>
+                    <img class="custom-token-image" src="{{data.system.swingTokenImages.defaultTokenImagePath}}" data-edit="system.swingTokenImages.defaultTokenImagePath" height="100" width="100" />
+                </p>
+                {{/if}}
+            </p>
         </div>
         <div class="tab gifts" data-group="primary" data-tab="gifts">
             {{> "systems/sentiment/templates/partials/gift-list.html" title="Primary" equipStatus=GiftEquipStatus.Primary gifts=primaryGifts}}
