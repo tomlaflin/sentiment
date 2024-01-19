@@ -188,6 +188,18 @@ export default class CharacterSheet extends ActorSheet {
         html.find(".roll-to-do").click(this.#onRollToDo.bind(this));
         html.find(".roll-to-dye").click(this.#onRollToDye.bind(this));
         html.find(".recovery-roll").click(this.#onRecoveryRoll.bind(this));
+
+        html.find(".roll-to-do").each((i, button) => {
+            button.setAttribute("draggable", true);
+            button.addEventListener("dragstart", event => {
+                let dragData = {
+                    macroName: this.object.name + ": Roll to Do",
+                    actorId: this.object._id,
+                    function: "rollToDo"
+                };
+                event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
+            }, false);
+        });
     }
 
     /**
@@ -448,78 +460,7 @@ export default class CharacterSheet extends ActorSheet {
     */
     async #onRollToDo(event) {
         event.preventDefault();
-
-        const d20Roll = await new Roll("1d20").evaluate();
-        let templatePath = "systems/sentiment/templates/rolls/";
-        let templateValues = {
-            d20Roll: d20Roll.total,
-            total: d20Roll.total
-        };
-
-        if (this.#swingAttribute !== null) {
-            templatePath += "roll-to-do-swing.html";
-
-            templateValues.swingValue = this.#swingValue;
-            templateValues.swingAttribute = this.#swingAttribute.name;
-            templateValues.total += this.#swingValue;
-        }
-        else {
-            templatePath += "roll-to-do-no-swing.html";
-
-            const d6Roll = await new Roll("1d6").evaluate();
-            templateValues.d6Roll = d6Roll.total;
-            templateValues.total += d6Roll.total;
-
-            let dialogCanceled = false;
-            const chosenAttribute = await this.#renderRollToDoChooseAttributeDialog().catch(() => {
-                dialogCanceled = true;
-            });
-
-            if (dialogCanceled) {
-                return;
-            }
-
-            templateValues.attribute = chosenAttribute;
-            templateValues.total += chosenAttribute?.system.modifier ?? 0;
-        }
-
-        this.#renderToChatMessage(templatePath, templateValues);
-    }
-
-    /**
-    * Render a dialog allowing the user to choose which attribute they wish to use for a Roll to Do.
-    * @private
-    */
-    async #renderRollToDoChooseAttributeDialog() {
-        const contentTemplatePath = "systems/sentiment/templates/rolls/roll-to-do-choose-attribute.html";
-        const content = await renderTemplate(contentTemplatePath, {});
-
-        return new Promise((resolve, reject) => {
-            let buttons = {};
-
-            for (const attribute of this.#attributes) {
-                if (attribute.system.status == AttributeStatus.Normal) {
-                    buttons[attribute._id] = {
-                        label: attribute.name + " (+" + attribute.system.modifier + ")",
-                        callback: () => { resolve(attribute) }
-                    }
-                }
-            }
-
-            buttons.wild = {
-                label: "Wild",
-                callback: () => { resolve(null) }
-            }
-
-            const chooseAttributeDialog = {
-                title: "Roll To Do",
-                content: content,
-                buttons: buttons,
-                close: () => { reject() }
-            };
-
-            new Dialog(chooseAttributeDialog).render(true);
-        });
+        this.object.rollToDo();
     }
 
     /**
