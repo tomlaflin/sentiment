@@ -4,7 +4,10 @@ import AttributeSheet from "./sheets/attribute-sheet.mjs";
 import GiftData from "./documents/gift.mjs";
 import GiftSheet from "./sheets/gift-sheet.mjs";
 
-import CharacterData from "./documents/character.mjs";
+import {
+    CharacterData,
+    Character
+} from "./documents/character.mjs";
 import CharacterSheet from "./sheets/character-sheet.mjs";
 
 Hooks.once("init", async function () {
@@ -12,8 +15,9 @@ Hooks.once("init", async function () {
 
     CONFIG.Item.dataModels.attribute = AttributeData;
     CONFIG.Item.dataModels.gift = GiftData;
-
     CONFIG.Actor.dataModels.character = CharacterData;
+
+    CONFIG.Actor.documentClass = Character;
 
     Items.unregisterSheet("core", ItemSheet);
     Items.registerSheet("sentiment", AttributeSheet, { makeDefault: true });

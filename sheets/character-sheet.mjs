@@ -3,6 +3,8 @@ import {
     GiftEquipStatus
 } from "../enums.mjs";
 
+import { AttributeIdNoSwing } from "../documents/character.mjs"
+
 export default class CharacterSheet extends ActorSheet {
 
     #attributes;
@@ -40,13 +42,14 @@ export default class CharacterSheet extends ActorSheet {
     /** @inheritdoc */
     async getData(options) {
         const context = await super.getData(options);
-
+        
+        context.showSwingTokenImageUI = this.object.isToken;
         await this.#populateDescription(context);
         this.#populateAttributes(context);
         this.#populateAttributeStatusProperties(context);
         this.#populateGifts(context);
         this.#cacheSwing(context);
-        this.#populateGiftEquipStatus(context);
+        this.#populateConstants(context);
 
         return context;
     }
@@ -146,18 +149,19 @@ export default class CharacterSheet extends ActorSheet {
     }
 
     /**
-    * Embed the GiftEquipStatus enum in the context so its values can be referenced in Handlebars.
+    * Embed constants and enums in the context so their values can be referenced in Handlebars.
     * @param context
     * @private
     */
-    async #populateGiftEquipStatus(context) {
+    async #populateConstants(context) {
+        context.AttributeIdNoSwing = AttributeIdNoSwing;
         context.GiftEquipStatus = GiftEquipStatus;
     }
 
     /** @inheritdoc */
     async _updateObject(event, formData) {
         await this.object.update({ "system.swing.attributeId": formData[`swing-attribute-selector`] }, {});
-
+        
         return super._updateObject(event, formData);
     }
 
@@ -191,7 +195,7 @@ export default class CharacterSheet extends ActorSheet {
     * @private
     */
     #updateSwingControls() {
-        this.form.querySelector(".swing-attribute-selector").value = this.#swingAttribute?._id ?? null;
+        this.form.querySelector(".swing-attribute-selector").value = this.#swingAttribute?._id ?? AttributeIdNoSwing;
 
         const swingValueInput = this.form.querySelector(".swing-value");
         swingValueInput.style.display = this.#swingAttribute ? "flex" : "none";

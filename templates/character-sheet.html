@@ -62,10 +62,20 @@
                 <a class="attribute-control attribute-add" title="Add New Attribute"><i class="fas fa-plus"></i> Add New Attribute</a>
             </p>
             <hr class="solid"></hr>
-            <label>Swing:</label>
+            {{#if showSwingTokenImageUI}}
+            <input type="checkbox" class="enable-swing-token-images" id="enable-swing-token-images" name="system.swingTokenImages.enabled" {{checked data.system.swingTokenImages.enabled}} />
+            <label for="enable-swing-token-images">Use Custom Token Images Per Swing</label>
+            {{#if data.system.swingTokenImages.enabled}}
+            <p>
+                <label class="custom-token-image-label" for="custom-token-image">Default Token (No Swing):</label>
+                <img class="custom-token-image" src="{{data.system.swingTokenImages.defaultTokenImagePath}}" data-edit="system.swingTokenImages.defaultTokenImagePath" height="100" width="100" />
+            </p>
+            {{/if}}
+            {{/if}}
+            <p><label>Swing:</label></p>
             <p class="flexrow">
                 <select class="swing-attribute-selector" name="swing-attribute-selector">
-                    <option value=null>None</option>
+                    <option value={{AttributeIdNoSwing}}>None</option>
                     {{#each attributes as |attribute id|}}
                     {{#if (isStatusNormal attribute)}}
                     <option value="{{attribute._id}}">{{attribute.name}}</option>

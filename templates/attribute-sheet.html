@@ -3,8 +3,18 @@
         <img src="{{data.img}}" data-edit="img" title="{{data.name}}" height="64" width="64" />
         <h1><input name="name" type="text" value="{{data.name}}" placeholder="Name" /></h1>
     </header>
-    <label class="color-label"> Color: </label>
-    <input type="color" name="colorPicker" value="{{colorString}}" />
-    <label class="modifier-label"> Modifier: </label>
-    <input type="number" name="system.modifier" value="{{data.system.modifier}}" min="0" data-dtype="Number" />
+    <p>
+        <label class="color-label" for="colorPicker"> Color: </label>
+        <input type="color" name="colorPicker" id="colorPicker" value="{{colorString}}" />
+    </p>
+    <p>
+        <label class="modifier-label" for="modifier"> Modifier: </label>
+        <input type="number" name="system.modifier" id="modifier" value="{{data.system.modifier}}" min="0" data-dtype="Number" />
+    </p>
+    {{#if showCustomTokenImage}}
+    <p>
+        <label class="custom-token-image-label" for="custom-token-image"> Custom Token Image: </label>
+        <img class="custom-token-image" src="{{data.system.customTokenImagePath}}" data-edit="system.customTokenImagePath" height="100" width="100" />
+    </p>
+    {{/if}}
 </form>

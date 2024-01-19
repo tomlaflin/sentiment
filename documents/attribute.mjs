@@ -18,6 +18,9 @@ export default class AttributeData extends foundry.abstract.DataModel {
                 integer: true,
                 initial: AttributeStatus.Normal
             }),
+            customTokenImagePath: new foundry.data.fields.StringField({
+                initial: "icons/svg/mystery-man.svg"
+            })
         };
     }
 }
