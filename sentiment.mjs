@@ -11,7 +11,7 @@ import {
 
 import CharacterSheet from "./sheets/character-sheet.mjs";
 
-import createCharacterMacro from "./macro.mjs"
+import tryCreateCharacterMacro from "./macro.mjs"
 
 Hooks.once("init", async function () {
     console.log(`Initializing Sentiment System`); 
@@ -34,4 +34,4 @@ Hooks.once("init", async function () {
     await loadTemplates(["systems/sentiment/templates/partials/gift-list.html"]);
 });
 
-Hooks.on("hotbarDrop", (bar, data, slot) => createCharacterMacro(data, slot));
+Hooks.on("hotbarDrop", (bar, data, slot) => tryCreateCharacterMacro(data, slot));

@@ -3,9 +3,9 @@
  * @param data
  * @param slot
  */
-export default async function createCharacterMacro(data, slot) {
+export default async function tryCreateCharacterMacro(data, slot) {
     if (!data.actorId || !data.function) {
-        throw new Error("createCharacterMacro called with required values missing from data object.");
+        return;
     }
     
     const command =

@@ -189,13 +189,24 @@ export default class CharacterSheet extends ActorSheet {
         html.find(".roll-to-dye").click(this.#onRollToDye.bind(this));
         html.find(".recovery-roll").click(this.#onRecoveryRoll.bind(this));
 
-        html.find(".roll-to-do").each((i, button) => {
+        this.#setMacroDataOnButton(html, ".drop-swing", "dropSwing");
+        this.#setMacroDataOnButton(html, ".roll-to-do", "rollToDo");
+        this.#setMacroDataOnButton(html, ".roll-to-dye", "rollToDye");
+        this.#setMacroDataOnButton(html, ".recovery-roll", "recoveryRoll");
+    }
+
+    /**
+    * Set up the specified button so it can be dragged to the macro bar to create a shortcut to its function.
+    * @private
+    */
+    #setMacroDataOnButton(html, htmlClass, functionName) {
+        html.find(htmlClass).each((i, button) => {
             button.setAttribute("draggable", true);
             button.addEventListener("dragstart", event => {
                 let dragData = {
-                    macroName: this.object.name + ": Roll to Do",
+                    macroName: this.object.name + ": " + button.title,
                     actorId: this.object._id,
-                    function: "rollToDo"
+                    function: functionName
                 };
                 event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
             }, false);
@@ -431,12 +442,7 @@ export default class CharacterSheet extends ActorSheet {
     */
     #onDropSwing(event) {
         event.preventDefault();
-
-        if (this.#swingAttribute === null) {
-            return;
-        }
-
-        this.#removeSwing();
+        this.object.dropSwing();
     }
 
     /**
@@ -488,13 +494,7 @@ export default class CharacterSheet extends ActorSheet {
     */
     async #onRollToDye(event) {
         event.preventDefault();
-
-        const rollToDyeOptions = {
-            rollTitle: "Roll to Dye",
-            totalStrategy: this.#totalAllAttributeRollsAndOnlySwingModifier,
-        }
-
-        this.#executeRollToDye(rollToDyeOptions);
+        this.object.rollToDye();
     }
 
     /**
@@ -504,181 +504,6 @@ export default class CharacterSheet extends ActorSheet {
     */
     async #onRecoveryRoll(event) {
         event.preventDefault();
-
-        const rollToDyeOptions = {
-            rollTitle: "Recovery Roll",
-            totalStrategy: this.#totalAllAttributeRollsAndModifiers,
-        }
-
-        const rollToDyeTotal = await this.#executeRollToDye(rollToDyeOptions);
-        const newHealth = Math.min(this.object.system.health.value + rollToDyeTotal, this.object.system.health.max);
-
-        this.object.update({
-            "system.health.value": newHealth
-        });
-    }
-
-    /**
-    * Common implementation of Roll to Dye. Scenario-specific parameters are injected via an options object.
-    * @param rollToDyeOptions
-    * @private
-    */
-    async #executeRollToDye(rollToDyeOptions) {
-        const existingSwingAttributeDie = this.#swingAttribute ? {
-            attribute: this.#swingAttribute,
-            roll: this.#swingValue - this.#swingAttribute.system.modifier,
-            existing: true
-        } : null;
-
-        const attributeDice = await this.#rollAttributeDice(existingSwingAttributeDie);
-        await this.#renderAttributeDice(rollToDyeOptions.rollTitle, attributeDice);
-
-        const availableAttributeDice = attributeDice.filter((attributeDie) => attributeDie.attribute.system.status == AttributeStatus.Normal);
-        this.#releaseAttributesFromLockout();
-
-        const chosenAttributeDie = availableAttributeDice.length > 0 ? await this.#renderChooseSwingDialog(rollToDyeOptions.rollTitle, availableAttributeDice) : null;
-        if (chosenAttributeDie != null) {
-            this.object.update({
-                "system.swing.attributeId": chosenAttributeDie.attribute._id,
-                "system.swing.value": chosenAttributeDie.roll + chosenAttributeDie.attribute.system.modifier
-            });
-        }
-
-        const newSwingAttributeDie = chosenAttributeDie ?? existingSwingAttributeDie;
-        const rollToDyeTotal = rollToDyeOptions.totalStrategy(availableAttributeDice, newSwingAttributeDie);
-        this.#renderRollToDyeResult(rollToDyeOptions.rollTitle, rollToDyeTotal, newSwingAttributeDie);
-
-        return rollToDyeTotal;
-    }
-
-    /**
-    * Roll a d6 associated with each of the character's attributes. The character's existing swing attribute, if any, is retained at its current value.
-    * @param swingAttributeDie
-    * @private
-    */
-    async #rollAttributeDice(swingAttributeDie) {
-        let attributeDice = [];
-
-        for (const attribute of this.#attributes) {
-            if (attribute._id == swingAttributeDie?.attribute._id) {
-                attributeDice.push(swingAttributeDie);
-            }
-            else {
-                const d6Roll = await new Roll("1d6").evaluate();
-                attributeDice.push({
-                    attribute: attribute,
-                    roll: d6Roll.total,
-                    existing: false
-                });
-            }
-        }
-
-        return attributeDice;
-    }
-
-    /**
-    * Render a chat message announcing the character's rolls on their attribute dice.
-    * @param rollTitle
-    * @param attributeDice
-    * @private
-    */
-    async #renderAttributeDice(rollTitle, attributeDice) {
-        const templatePath = "systems/sentiment/templates/rolls/roll-to-dye-dice.html";
-        return this.#renderToChatMessage(templatePath, {
-            title: rollTitle,
-            attributeDice: attributeDice
-        });
-    }
-
-    /**
-    * Restore all locked-out attributes to normal status.
-    * @private
-    */
-    #releaseAttributesFromLockout() {
-        for (const attribute of this.#attributes) {
-            if (attribute.system.status == AttributeStatus.LockedOut) {
-                this.actor.items.get(attribute._id).update({ "system.status": AttributeStatus.Normal });
-            }
-        }   
-    }
-
-    /**
-    * Render a dialog allowing the user to choose a new swing for the character based on the results of their Roll to Dye.
-    * @param dialogTitle
-    * @param attributeDice
-    * @private
-    */
-    async #renderChooseSwingDialog(dialogTitle, attributeDice) {
-        const contentTemplatePath = "systems/sentiment/templates/rolls/roll-to-dye-choose-swing.html";
-        const content = await renderTemplate(contentTemplatePath, {});
-        
-        return new Promise((resolve, reject) => {
-            let buttons = {};
-
-            for (let attributeDie of attributeDice) {
-                const swingValue = attributeDie.roll + attributeDie.attribute.system.modifier;
-                buttons[attributeDie.attribute._id] = {
-                    label: attributeDie.attribute.name + ": " + swingValue,
-                    callback: () => { resolve(attributeDie) }
-                }
-            }
-
-            const chooseSwingDialog = {
-                title: dialogTitle,
-                content: content,
-                buttons: buttons,
-                close: () => { resolve(null) }
-            };
-
-            new Dialog(chooseSwingDialog).render(true);
-        });
-    }
-
-    /**
-    * Total attribute dice including the modifier of each die. The swing die is not treated specially.
-    * @param attributeDice
-    * @param swingAttributeDie
-    * @private
-    */
-    #totalAllAttributeRollsAndModifiers(attributeDice, swingAttributeDie) {
-        return attributeDice.reduce((total, attributeDie) => total + attributeDie.roll + attributeDie.attribute.system.modifier, 0);
-    }
-
-    /**
-    * Total attribute dice, but only add the modifier of the swing die.
-    * @param attributeDice
-    * @param swingAttributeDie
-    * @private
-    */
-    #totalAllAttributeRollsAndOnlySwingModifier(attributeDice, swingAttributeDie) {
-        let total = attributeDice.reduce((total, attributeDie) => total + attributeDie.roll, 0);
-        total += swingAttributeDie?.attribute.system.modifier ?? 0;
-        return total;
-    }
-
-    /**
-    * Render a chat message announcing the final result of the character's Roll to Dye including their chosen swing, if any.
-    * @param rollTitle
-    * @param total
-    * @param swingAttributeDie
-    * @private
-    */
-    async #renderRollToDyeResult(rollTitle, total, swingAttributeDie) {
-        let templatePath = "systems/sentiment/templates/rolls/";
-        let templateValues = {
-            title: rollTitle,
-            total: total
-        };
-
-        if (swingAttributeDie === null) {
-            templatePath += "roll-to-dye-result-no-swing.html";
-        }
-        else {
-            templatePath += "roll-to-dye-result-swing.html";
-            templateValues.swingAttributeName = swingAttributeDie.attribute.name;
-            templateValues.swingValue = swingAttributeDie.roll + swingAttributeDie.attribute.system.modifier;
-        }
-        
-        this.#renderToChatMessage(templatePath, templateValues);
+        this.object.recoveryRoll();
     }
 }
