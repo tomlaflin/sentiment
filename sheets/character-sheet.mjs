@@ -363,16 +363,31 @@ export default class CharacterSheet extends ActorSheet {
             return super._onDrop(event);
         }
 
+        const giftDroppedUponId = event.target.closest(".gift")?.dataset["itemId"];
+        this.#handleGiftDroppedOnList(droppedGiftId, giftDroppedUponId, giftListContainerHtml);
+    }
+
+    /**
+    * React to a gift being dropped in a gift list by updating the gift's equip status and rearranging the destination list if necessary.
+    * Gifts dropped on the header of a list move to the top of that list. Gifts dropped on another gift move either directly before that
+    * gift (if dropped gift was moved up) or directly after that gift (if the dropped gift was moved down.)
+    * @param droppedGiftId
+    * @param giftDroppedUponId
+    * @param giftListContainerHtml
+    * @private
+    */
+    #handleGiftDroppedOnList(droppedGiftId, giftDroppedUponId, giftListContainerHtml) {
+        if (droppedGiftId === giftDroppedUponId) {
+            return;
+        }
+
         const droppedGift = this.object.items.find((item) => item._id === droppedGiftId);
         if (!droppedGift) {
             throw new Error("Dropped gift ID not found among the character's items.");
         }
 
-        const giftDroppedUpon = this.object.items.get(event.target.closest(".gift")?.dataset["itemId"]);
-        if (giftDroppedUpon && giftDroppedUpon._id == droppedGiftId) {
-            return;
-        }
-        
+        const giftDroppedUpon = this.object.items.get(giftDroppedUponId);
+
         const giftEquipStatusFrom = droppedGift.system.equipStatus;
         const giftEquipStatusTo = Number(giftListContainerHtml.dataset["giftEquipStatus"]);
 
@@ -385,7 +400,7 @@ export default class CharacterSheet extends ActorSheet {
         const destinationGiftList = this.#gifts[giftEquipStatusTo];
         if (destinationGiftList.length > 0) {
             let targetListIndex = 0;
-            
+
             if (giftDroppedUpon) {
                 const movingToHigherList = giftEquipStatusFrom !== giftEquipStatusTo
                     && (giftEquipStatusTo == GiftEquipStatus.Primary || giftEquipStatusFrom == GiftEquipStatus.Unequipped);
