@@ -1,7 +1,7 @@
 import AttributeData from "./documents/attribute.mjs";
 import AttributeSheet from "./sheets/attribute-sheet.mjs";
 
-import GiftData from "./documents/gift.mjs";
+import { GiftData } from "./documents/gift.mjs";
 import GiftSheet from "./sheets/gift-sheet.mjs";
 
 import {

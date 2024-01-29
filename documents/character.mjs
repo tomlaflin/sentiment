@@ -1,5 +1,6 @@
-export const AttributeIdNoSwing = "ATTRIBUTE_ID_NO_SWING";
 import { AttributeStatus } from "../enums.mjs";
+
+export const AttributeIdNoSwing = "ATTRIBUTE_ID_NO_SWING";
 
 export class CharacterData extends foundry.abstract.DataModel {
     static defineSchema() {

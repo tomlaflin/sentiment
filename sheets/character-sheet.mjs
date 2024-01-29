@@ -4,6 +4,9 @@ import {
 } from "../enums.mjs";
 
 import { AttributeIdNoSwing } from "../documents/character.mjs"
+import { GiftEquipStatusInitial } from "../documents/gift.mjs"
+
+const ListSortValueIncrement = 100000;
 
 export default class CharacterSheet extends ActorSheet {
     
@@ -306,9 +309,13 @@ export default class CharacterSheet extends ActorSheet {
     async #onGiftAdd(event) {
         event.preventDefault();
 
+        const giftList = this.#gifts[GiftEquipStatusInitial];
+        const sortValue = giftList.length > 0 ? giftList[giftList.length - 1].sort + ListSortValueIncrement : 0;
+
         const itemData = {
             name: "New Gift",
             type: "gift",
+            sort: sortValue
         };
 
         return await Item.create(itemData, { parent: this.actor });
@@ -413,10 +420,10 @@ export default class CharacterSheet extends ActorSheet {
 
             let newSortValue;
             if (targetListIndex == 0) {
-                newSortValue = destinationGiftList[0].sort - 100000;
+                newSortValue = destinationGiftList[0].sort - ListSortValueIncrement;
             }
             else if (targetListIndex == destinationGiftList.length) {
-                newSortValue = destinationGiftList[destinationGiftList.length - 1].sort + 100000;
+                newSortValue = destinationGiftList[destinationGiftList.length - 1].sort + ListSortValueIncrement;
             }
             else {
                 newSortValue = (destinationGiftList[targetListIndex].sort + destinationGiftList[targetListIndex - 1].sort) / 2;
