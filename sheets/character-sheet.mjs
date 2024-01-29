@@ -6,8 +6,7 @@ import {
 import { AttributeIdNoSwing } from "../documents/character.mjs"
 
 export default class CharacterSheet extends ActorSheet {
-
-    #attributes;
+    
     #swingAttribute;
     #swingValue;
     #gifts;
@@ -72,14 +71,12 @@ export default class CharacterSheet extends ActorSheet {
     * @private
     */
     #populateAttributes(context) {
-        this.#attributes = [];
+        context.attributes = [];
         for (let item of context.items) {
             if (item.type == "attribute") {
-                this.#attributes.push(item);
+                context.attributes.push(item);
             }
         }
-
-        context.attributes = this.#attributes;
     }
 
     /**
@@ -234,7 +231,7 @@ export default class CharacterSheet extends ActorSheet {
         event.preventDefault();
 
         const attribute = this.#getItemFromListEvent(event);
-        attribute.update({ "system.status": AttributeStatus.Normal });
+        this.object.restoreAttribute(attribute._id);
     }
 
     /**
@@ -246,11 +243,7 @@ export default class CharacterSheet extends ActorSheet {
         event.preventDefault();
         
         const attribute = this.#getItemFromListEvent(event);
-        attribute.update({ "system.status": AttributeStatus.LockedOut });
-
-        if (attribute._id === this.#swingAttribute?._id) {
-            this.#removeSwing();
-        }
+        this.object.lockOutAttribute(attribute._id);
     }
 
     /**
@@ -262,11 +255,7 @@ export default class CharacterSheet extends ActorSheet {
         event.preventDefault();
 
         const attribute = this.#getItemFromListEvent(event);
-        attribute.update({ "system.status": AttributeStatus.Wounded });
-
-        if (attribute._id === this.#swingAttribute?._id) {
-            this.#removeSwing();
-        }
+        this.object.woundAttribute(attribute._id);
     }
 
     /**
@@ -436,30 +425,6 @@ export default class CharacterSheet extends ActorSheet {
     }
 
     /**
-    * Handle event when the user drops the character's swing.
-    * @param event
-    * @private
-    */
-    #onDropSwing(event) {
-        event.preventDefault();
-        this.object.dropSwing();
-    }
-
-    /**
-    * Remove character's swing and send a notification in chat.
-    * @private
-    */
-    #removeSwing() {
-        this.object.update({
-            "system.swing.attributeId": null,
-            "system.swing.value": 0
-        });
-
-        const templatePath = "systems/sentiment/templates/rolls/drop-swing.html";
-        this.#renderToChatMessage(templatePath, {});
-    }
-
-    /**
     * Handle event when the user performs a Roll to Do.
     * @param event
     * @private
@@ -467,24 +432,6 @@ export default class CharacterSheet extends ActorSheet {
     async #onRollToDo(event) {
         event.preventDefault();
         this.object.rollToDo();
-    }
-
-    /**
-    * Render an HTML template with arguments as a chat message with this character as the speaker.
-    * @param templatePath
-    * @param args
-    * @private
-    */
-    async #renderToChatMessage(templatePath, args) {
-        const html = await renderTemplate(templatePath, args);
-        let message = {
-            speaker: {
-                alias: this.actor.name
-            },
-            content: html
-        };
-
-        return ChatMessage.create(message);
     }
 
     /**
@@ -505,5 +452,15 @@ export default class CharacterSheet extends ActorSheet {
     async #onRecoveryRoll(event) {
         event.preventDefault();
         this.object.recoveryRoll();
+    }
+
+    /**
+    * Handle event when the user drops the character's swing.
+    * @param event
+    * @private
+    */
+    #onDropSwing(event) {
+        event.preventDefault();
+        this.object.dropSwing();
     }
 }

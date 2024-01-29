@@ -360,7 +360,6 @@ export class Character extends Actor {
 
     /**
     * Drop the character's swing, if any.
-    * @private
     */
     async dropSwing() {
         if (this.system.swing.attributeId === AttributeIdNoSwing) {
@@ -374,6 +373,41 @@ export class Character extends Actor {
 
         const templatePath = "systems/sentiment/templates/rolls/drop-swing.html";
         return this.#renderToChatMessage(templatePath, {});
+    }
+
+    /**
+    * Restore the specified attribute.
+    * @param attributeId
+    */
+    restoreAttribute(attributeId) {
+        const attribute = this.items.find((item) => item._id === attributeId);
+        attribute.update({ "system.status": AttributeStatus.Normal });
+    }
+
+    /**
+    * Lock out the specified attribute.
+    * @param attributeId
+    */
+    lockOutAttribute(attributeId) {
+        const attribute = this.items.find((item) => item._id === attributeId);
+        attribute.update({ "system.status": AttributeStatus.LockedOut });
+
+        if (attributeId === this.system.swing.attributeId) {
+            this.dropSwing();
+        }
+    }
+
+    /**
+    * Wound the specified attribute.
+    * @param attributeId
+    */
+    woundAttribute(attributeId) {
+        const attribute = this.items.find((item) => item._id === attributeId);
+        attribute.update({ "system.status": AttributeStatus.Wounded });
+
+        if (attributeId === this.system.swing.attributeId) {
+            this.dropSwing();
+        }
     }
 
     /** @inheritdoc */
