@@ -150,8 +150,7 @@ export default class CharacterSheet extends ActorSheet {
     /** @inheritdoc */
     activateListeners(html) {
         super.activateListeners(html);
-
-        this.#updateSwingControls();
+        
         html.find('.attribute-open').click(this.#onAttributeOpen.bind(this));
         html.find('.gift-open').click(this.#onGiftOpen.bind(this));
 
