@@ -7,10 +7,12 @@ export default async function tryCreateCharacterMacro(data, slot) {
     if (!data.actorId || !data.function) {
         return;
     }
+
+    const argsLiteral = data.argsLiteral ?? "";
     
     const command =
 `const actor = game.actors.get("${data.actorId}");
-actor.${data.function}();`
+actor.${data.function}(${argsLiteral});`
 
     const macro = await Macro.create({
         name: data.macroName,

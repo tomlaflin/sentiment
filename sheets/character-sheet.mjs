@@ -25,6 +25,10 @@ export default class CharacterSheet extends ActorSheet {
         Handlebars.registerHelper('isStatusWounded', function (attribute) {
             return attribute.system.status == AttributeStatus.Wounded;
         });
+
+        Handlebars.registerHelper('toJSON', function (object) {
+            return JSON.stringify(object);
+        });
     }
 
     /** @inheritdoc */
@@ -151,16 +155,16 @@ export default class CharacterSheet extends ActorSheet {
     activateListeners(html) {
         super.activateListeners(html);
         
-        html.find('.attribute-open').click(this.#onAttributeOpen.bind(this));
-        html.find('.gift-open').click(this.#onGiftOpen.bind(this));
+        html.find(".attribute-open").click(this.#onAttributeOpen.bind(this));
+        html.find(".gift-open").click(this.#onGiftOpen.bind(this));
 
         if (!this.isEditable) {
             return;
         }
 
-        html.find('.attribute-restore').click(this.#onAttributeRestore.bind(this));
-        html.find('.attribute-lock-out').click(this.#onAttributeLockOut.bind(this));
-        html.find('.attribute-wound').click(this.#onAttributeWound.bind(this));
+        html.find(".attribute-restore").click(this.#onAttributeRestore.bind(this));
+        html.find(".attribute-lock-out").click(this.#onAttributeLockOut.bind(this));
+        html.find(".attribute-wound").click(this.#onAttributeWound.bind(this));
         html.find(".attribute-add").click(this.#onAttributeAdd.bind(this));
         html.find(".attribute-delete").click(this.#onAttributeDelete.bind(this));
         html.find(".gift-add").click(this.#onGiftAdd.bind(this));
@@ -173,17 +177,21 @@ export default class CharacterSheet extends ActorSheet {
         html.find(".roll-to-dye").click(this.#onRollToDye.bind(this));
         html.find(".recovery-roll").click(this.#onRecoveryRoll.bind(this));
 
-        this.#setMacroDataOnButton(html, ".drop-swing", "dropSwing");
-        this.#setMacroDataOnButton(html, ".roll-to-do", "rollToDo");
-        this.#setMacroDataOnButton(html, ".roll-to-dye", "rollToDye");
-        this.#setMacroDataOnButton(html, ".recovery-roll", "recoveryRoll");
+        this.#setDragDataOnButton(html, ".drop-swing", "dropSwing");
+        this.#setDragDataOnButton(html, ".roll-to-do", "rollToDo");
+        this.#setDragDataOnButton(html, ".roll-to-dye", "rollToDye");
+        this.#setDragDataOnButton(html, ".recovery-roll", "recoveryRoll");
+        this.#setDragDataOnCustomRolls(html);
     }
 
     /**
     * Set up the specified button so it can be dragged to the macro bar to create a shortcut to its function.
+    * @param html
+    * @param htmlClass
+    * @param functionName
     * @private
     */
-    #setMacroDataOnButton(html, htmlClass, functionName) {
+    #setDragDataOnButton(html, htmlClass, functionName) {
         html.find(htmlClass).each((i, button) => {
             button.setAttribute("draggable", true);
             button.addEventListener("dragstart", event => {
@@ -191,6 +199,27 @@ export default class CharacterSheet extends ActorSheet {
                     macroName: this.object.name + ": " + button.title,
                     actorId: this.object._id,
                     function: functionName
+                };
+                event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
+            }, false);
+        });
+    }
+
+    /**
+    * Set up custom roll list items so they can be dragged to the macro bar to create shortcuts to their functions.
+    * @private
+    * @param html
+    */
+    #setDragDataOnCustomRolls(html) {
+        html.find(".custom-roll").each((i, element) => {
+            element.setAttribute("draggable", true);
+            element.addEventListener("dragstart", event => {
+                const customRoll = JSON.parse(event.target.dataset["customRoll"]);
+                let dragData = {
+                    macroName: this.object.name + ": " + customRoll.name,
+                    actorId: this.object._id,
+                    function: customRoll.rollType,
+                    argsLiteral: `"${customRoll.formula}"`
                 };
                 event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
             }, false);

@@ -112,7 +112,7 @@
             </header>
             <ol class="list custom-rolls-list">
                 {{#each data.system.customRolls as |customRoll index|}}
-                <li class="custom-roll list-item flexrow" data-index="{{index}}">
+                <li class="custom-roll list-item flexrow" data-index="{{index}}" data-custom-roll="{{toJSON customRoll}}">
                     <input type="text" name="system.customRolls.{{index}}.name" value="{{customRoll.name}}" />
                     <select class="custom-roll-type-selector" name="system.customRolls.{{index}}.rollType">
                         {{#select customRoll.rollType}}
