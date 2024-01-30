@@ -167,6 +167,7 @@ export default class CharacterSheet extends ActorSheet {
         html.find(".gift-delete").click(this.#onGiftDelete.bind(this));
         html.find(".custom-roll-add").click(this.#onCustomRollAdd.bind(this));
         html.find(".custom-roll-delete").click(this.#onCustomRollDelete.bind(this));
+        html.find(".custom-roll-execute").click(this.#onCustomRollExecute.bind(this));
         html.find(".drop-swing").click(this.#onDropSwing.bind(this));
         html.find(".roll-to-do").click(this.#onRollToDo.bind(this));
         html.find(".roll-to-dye").click(this.#onRollToDye.bind(this));
@@ -339,6 +340,20 @@ export default class CharacterSheet extends ActorSheet {
         const index = listItem.data("index");
 
         return this.object.deleteCustomRoll(index);
+    }
+
+    /**
+    * Handle event when the user executes a custom roll.
+    * @param event
+    * @private
+    */
+    async #onCustomRollExecute(event) {
+        event.preventDefault();
+
+        const listItem = $(event.currentTarget).parents(".list-item");
+        const index = listItem.data("index");
+
+        return this.object.executeCustomRoll(index);
     }
 
     /** @inheritdoc */

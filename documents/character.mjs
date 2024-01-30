@@ -81,32 +81,39 @@ export class Character extends Actor {
 
     /**
     * Perform a Roll to Do and display the result as a chat message.
+    * @param additionalDiceFormula
     */
-    async rollToDo() {
+    async rollToDo(additionalDiceFormula) {
         const swingAttribute = this.#getSwingAttribute();
         const swingValue = this.system.swing.value;
-        
+
         const d20Roll = await new Roll("1d20").evaluate();
         let templatePath = "systems/sentiment/templates/rolls/";
         let templateValues = {
             d20Roll: d20Roll.total,
             total: d20Roll.total
         };
-        
+
+        if (additionalDiceFormula) {
+            const additionalDiceRoll = await new Roll(additionalDiceFormula).evaluate();
+            templateValues.additionalDice = additionalDiceRoll;
+            templateValues.total += additionalDiceRoll.total;
+        }
+
         if (swingAttribute) {
             templatePath += "roll-to-do-swing.html";
-        
+
             templateValues.swingValue = swingValue;
             templateValues.swingAttribute = swingAttribute.name;
             templateValues.total += swingValue;
         }
         else {
             templatePath += "roll-to-do-no-swing.html";
-        
+
             const d6Roll = await new Roll("1d6").evaluate();
             templateValues.d6Roll = d6Roll.total;
             templateValues.total += d6Roll.total;
-        
+
             let dialogCanceled = false;
             const chosenAttribute = await this.#renderRollToDoChooseAttributeDialog().catch(() => {
                 dialogCanceled = true;
@@ -115,11 +122,11 @@ export class Character extends Actor {
             if (dialogCanceled) {
                 return;
             }
-        
+
             templateValues.attribute = chosenAttribute;
             templateValues.total += chosenAttribute?.system.modifier ?? 0;
         }
-        
+
         return this.#renderToChatMessage(templatePath, templateValues);
     }
 
@@ -134,7 +141,7 @@ export class Character extends Actor {
 
         return new Promise((resolve, reject) => {
             let buttons = {};
-            
+
             attributes.filter((attribute) => attribute.system.status == AttributeStatus.Normal).forEach((attribute) =>
                 buttons[attribute._id] = {
                     label: attribute.name + " (+" + attribute.system.modifier + ")",
@@ -153,7 +160,7 @@ export class Character extends Actor {
                 buttons: buttons,
                 close: () => { reject() }
             };
-            
+
             new Dialog(chooseAttributeDialog).render(true);
         });
     }
@@ -178,25 +185,27 @@ export class Character extends Actor {
 
     /**
     * Perform a Roll to Dye and display the result as a chat message.
+    * @param additionalDiceFormula
     */
-    async rollToDye() {
+    async rollToDye(additionalDiceFormula) {
         const rollToDyeOptions = {
             rollTitle: "Roll to Dye",
             totalStrategy: this.#totalAllAttributeRollsAndOnlySwingModifier,
         }
 
-        this.#rollToDyeImpl(rollToDyeOptions);
+        this.#rollToDyeImpl(rollToDyeOptions, additionalDiceFormula);
     }
 
     /**
     * Perform a Recovery Roll and display the result as a chat message.
+    * @param additionalDiceFormula
     */
-    async recoveryRoll() {
+    async recoveryRoll(additionalDiceFormula) {
         const rollToDyeOptions = {
             rollTitle: "Recovery Roll",
             totalStrategy: this.#totalAllAttributeRollsAndModifiers,
         }
-        const rollToDyeTotal = await this.#rollToDyeImpl(rollToDyeOptions);
+        const rollToDyeTotal = await this.#rollToDyeImpl(rollToDyeOptions, additionalDiceFormula);
         const newHealth = Math.min(this.system.health.value + rollToDyeTotal, this.system.health.max);
 
         return this.update({
@@ -228,10 +237,11 @@ export class Character extends Actor {
 
     /**
     * Common implementation of Roll to Dye. Scenario-specific parameters are injected via an options object.
-    * @param rollToDyeOptions
+    * @param options
+    * @param additionalDiceFormula
     * @private
     */
-    async #rollToDyeImpl(rollToDyeOptions) {
+    async #rollToDyeImpl(options, additionalDiceFormula) {
         const swingAttribute = this.#getSwingAttribute();
         const swingValue = this.system.swing.value;
         const existingSwingAttributeDie = swingAttribute ? {
@@ -241,22 +251,23 @@ export class Character extends Actor {
         } : null;
 
         const attributeDice = await this.#rollAttributeDice(existingSwingAttributeDie);
-        await this.#renderAttributeDice(rollToDyeOptions.rollTitle, attributeDice);
+        const additionalDice = additionalDiceFormula ? await new Roll(additionalDiceFormula).evaluate() : null;
+        await this.#renderAttributeDice(options.rollTitle, attributeDice, additionalDice);
 
         const availableAttributeDice = attributeDice.filter((attributeDie) => attributeDie.attribute.system.status == AttributeStatus.Normal);
         this.#releaseAttributesFromLockout();
 
-        const chosenAttributeDie = availableAttributeDice.length > 0 ? await this.#renderChooseSwingDialog(rollToDyeOptions.rollTitle, availableAttributeDice) : null;
+        const chosenAttributeDie = availableAttributeDice.length > 0 ? await this.#renderChooseSwingDialog(options.rollTitle, availableAttributeDice) : null;
         if (chosenAttributeDie != null) {
             this.update({
                 "system.swing.attributeId": chosenAttributeDie.attribute._id,
                 "system.swing.value": chosenAttributeDie.roll + chosenAttributeDie.attribute.system.modifier
             });
         }
-
+        
         const newSwingAttributeDie = chosenAttributeDie ?? existingSwingAttributeDie;
-        const rollToDyeTotal = rollToDyeOptions.totalStrategy(availableAttributeDice, newSwingAttributeDie);
-        this.#renderRollToDyeResult(rollToDyeOptions.rollTitle, rollToDyeTotal, newSwingAttributeDie);
+        const rollToDyeTotal = options.totalStrategy(availableAttributeDice, newSwingAttributeDie) + (additionalDice ? additionalDice.total : 0);
+        this.#renderRollToDyeResult(options.rollTitle, rollToDyeTotal, newSwingAttributeDie);
 
         return rollToDyeTotal;
     }
@@ -291,13 +302,15 @@ export class Character extends Actor {
     * Render a chat message announcing the character's rolls on their attribute dice.
     * @param rollTitle
     * @param attributeDice
+    * @param additionalDice
     * @private
     */
-    async #renderAttributeDice(rollTitle, attributeDice) {
+    async #renderAttributeDice(rollTitle, attributeDice, additionalDice) {
         const templatePath = "systems/sentiment/templates/rolls/roll-to-dye-dice.html";
         return this.#renderToChatMessage(templatePath, {
             title: rollTitle,
-            attributeDice: attributeDice
+            attributeDice: attributeDice,
+            additionalDice: additionalDice
         });
     }
 
@@ -433,7 +446,7 @@ export class Character extends Actor {
 
         let customRolls = this.system.customRolls;
         customRolls.push(newCustomRoll);
-        return this.update({ "system.customRolls": customRolls});
+        return this.update({ "system.customRolls": customRolls });
     }
 
     /**
@@ -444,6 +457,28 @@ export class Character extends Actor {
         let customRolls = this.system.customRolls;
         customRolls.splice(index, 1);
         return this.update({ "system.customRolls": customRolls });
+    }
+
+    /**
+    * Executes the custom roll at the specified index.
+    * @param index
+    */
+    async executeCustomRoll(index) {
+        const customRoll = this.system.customRolls[index];
+        if (!customRoll) {
+            throw new Error("Attempting to execute undefined custom roll at index " + index);
+        }
+
+        switch (customRoll.rollType) {
+            case RollType.RollToDo:
+                return this.rollToDo(customRoll.formula);
+            case RollType.RollToDye:
+                return this.rollToDye(customRoll.formula);
+            case RollType.RecoveryRoll:
+                return this.recoveryRoll(customRoll.formula);
+            default:
+                throw new Error("Unknown RollType " + customRoll.RollType + " on custom roll at index " + index);
+        }
     }
 
     /** @inheritdoc */

@@ -4,4 +4,7 @@
 {{#if attribute}}
 <p>Modifier: +{{attribute.system.modifier}} ({{attribute.name}})</p>
 {{/if}}
+{{#if additionalDice}}
+<p>Additional: {{additionalDice.total}} ({{additionalDice.formula}})</p>
+{{/if}}
 <p>Total: {{total}}</p>
