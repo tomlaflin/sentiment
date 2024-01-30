@@ -1,6 +1,7 @@
 import {
     AttributeStatus,
-    GiftEquipStatus
+    GiftEquipStatus,
+    RollType
 } from "../enums.mjs";
 
 import { AttributeIdNoSwing } from "../documents/character.mjs"
@@ -10,8 +11,6 @@ const ListSortValueIncrement = 100000;
 
 export default class CharacterSheet extends ActorSheet {
     
-    #swingAttribute;
-    #swingValue;
     #gifts;
 
     static RegisterHandlebarsHelpers() {
@@ -44,14 +43,14 @@ export default class CharacterSheet extends ActorSheet {
     /** @inheritdoc */
     async getData(options) {
         const context = await super.getData(options);
-        
-        context.showSwingTokenImageUI = this.object.isToken;
+
         await this.#populateDescription(context);
-        this.#populateAttributes(context);
-        this.#populateAttributeStatusProperties(context);
-        this.#populateGifts(context);
-        this.#cacheSwing(context);
-        this.#populateConstants(context);
+        await this.#populateAttributes(context);
+        await this.#populateAttributeStatusProperties(context);
+        await this.#populateGifts(context);
+        await this.#populateConstants(context);
+
+        context.displaySwingValueInput = context.data.system.swing.attributeId !== AttributeIdNoSwing;
 
         return context;
     }
@@ -138,17 +137,6 @@ export default class CharacterSheet extends ActorSheet {
     }
 
     /**
-    * Find the properties associated with the character's current swing, if any, and cache them for reference after the form is rendered.
-    * @param context
-    * @private
-    */
-    #cacheSwing(context) {
-        const swingAttribute = context.attributes.find((attribute) => attribute._id == context.data.system.swing.attributeId);
-        this.#swingAttribute = swingAttribute ?? null;
-        this.#swingValue = swingAttribute ? context.data.system.swing.value : 0;
-    }
-
-    /**
     * Embed constants and enums in the context so their values can be referenced in Handlebars.
     * @param context
     * @private
@@ -156,13 +144,7 @@ export default class CharacterSheet extends ActorSheet {
     async #populateConstants(context) {
         context.AttributeIdNoSwing = AttributeIdNoSwing;
         context.GiftEquipStatus = GiftEquipStatus;
-    }
-
-    /** @inheritdoc */
-    async _updateObject(event, formData) {
-        await this.object.update({ "system.swing.attributeId": formData[`swing-attribute-selector`] }, {});
-        
-        return super._updateObject(event, formData);
+        context.RollType = RollType;
     }
 
     /** @inheritdoc */
@@ -184,6 +166,8 @@ export default class CharacterSheet extends ActorSheet {
         html.find(".attribute-delete").click(this.#onAttributeDelete.bind(this));
         html.find(".gift-add").click(this.#onGiftAdd.bind(this));
         html.find(".gift-delete").click(this.#onGiftDelete.bind(this));
+        html.find(".custom-roll-add").click(this.#onCustomRollAdd.bind(this));
+        html.find(".custom-roll-delete").click(this.#onCustomRollDelete.bind(this));
         html.find(".drop-swing").click(this.#onDropSwing.bind(this));
         html.find(".roll-to-do").click(this.#onRollToDo.bind(this));
         html.find(".roll-to-dye").click(this.#onRollToDye.bind(this));
@@ -211,18 +195,6 @@ export default class CharacterSheet extends ActorSheet {
                 event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
             }, false);
         });
-    }
-
-    /**
-    * Set value and display for the swing controls based on the cached swingAttributeId.
-    * @private
-    */
-    #updateSwingControls() {
-        this.form.querySelector(".swing-attribute-selector").value = this.#swingAttribute?._id ?? AttributeIdNoSwing;
-
-        const swingValueInput = this.form.querySelector(".swing-value");
-        swingValueInput.style.display = this.#swingAttribute ? "flex" : "none";
-        swingValueInput.value = this.#swingValue;
     }
 
     /**
@@ -343,6 +315,31 @@ export default class CharacterSheet extends ActorSheet {
 
         const gift = this.#getItemFromListEvent(event);
         gift.delete();
+    }
+
+    /**
+    * Handle event when the user adds a custom roll.
+    * @param event
+    * @private
+    */
+    async #onCustomRollAdd(event) {
+        event.preventDefault();
+
+        return this.object.addCustomRoll();
+    }
+
+    /**
+    * Handle event when the user deletes a custom roll.
+    * @param event
+    * @private
+    */
+    async #onCustomRollDelete(event) {
+        event.preventDefault();
+
+        const listItem = $(event.currentTarget).parents(".list-item");
+        const index = listItem.data("index");
+
+        return this.object.deleteCustomRoll(index);
     }
 
     /** @inheritdoc */

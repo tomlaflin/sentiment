@@ -40,7 +40,7 @@
 
         <div class="tab attributes" data-group="primary" data-tab="attributes">
             <ol class="list attribute-list">
-                {{#each attributes as |attribute id|}}
+                {{#each attributes as |attribute index|}}
                 <li class="attribute list-item flexrow" data-item-id="{{attribute._id}}">
                     <img class="list-image attribute-image" src="{{attribute.img}}" title="{{attribute.name}}" />
                     <h4 class="attribute-name">{{attribute.name}}</h4>
@@ -65,15 +65,19 @@
             <hr class="solid"></hr>
             <p><label>Swing:</label></p>
             <p class="flexrow">
-                <select class="swing-attribute-selector" name="swing-attribute-selector">
+                <select class="swing-attribute-selector" name="system.swing.attributeId">
+                    {{#select data.system.swing.attributeId}}
                     <option value={{AttributeIdNoSwing}}>None</option>
-                    {{#each attributes as |attribute id|}}
+                    {{#each attributes as |attribute index|}}
                     {{#if (isStatusNormal attribute)}}
                     <option value="{{attribute._id}}">{{attribute.name}}</option>
                     {{/if}}
                     {{/each}}
+                    {{/select}}
                 </select>
+                {{#if displaySwingValueInput}}
                 <input type="number" class="swing-value" name="system.swing.value" value="{{data.system.swing.value}}" min="0" data-dtype="Number" />
+                {{/if}}
             </p>
             <p><button class="button drop-swing" type="button" title="Drop Swing">Drop Swing</button></p>
             <p>
@@ -99,6 +103,35 @@
             <p><button class="button roll-to-do" type="button" title="Roll to Do">Roll to Do</button></p>
             <p><button class="button roll-to-dye" type="button" title="Roll to Dye">Roll to Dye</button></p>
             <p><button class="button recovery-roll" type="button" title="Recovery Roll">Recovery Roll</button></p>
+            <h3>Custom Rolls:</h3>
+            <header class="custom-rolls-header flexrow">
+                <span>Label</span>
+                <span>Roll Type</span>
+                <span>Additional Dice Formula</span>
+                <span/>
+            </header>
+            <ol class="list custom-rolls-list">
+                {{#each data.system.customRolls as |customRoll index|}}
+                <li class="custom-roll list-item flexrow" data-index="{{index}}">
+                    <input type="text" name="system.customRolls.{{index}}.name" value="{{customRoll.name}}" />
+                    <select class="custom-roll-type-selector" name="system.customRolls.{{index}}.rollType">
+                        {{#select customRoll.rollType}}
+                        <option value="{{../RollType.RollToDo}}">Roll to Do</option>
+                        <option value="{{../RollType.RollToDye}}">Roll to Dye</option>
+                        <option value="{{../RollType.RecoveryRoll}}">Recovery Roll</option>
+                        {{/select}}
+                    </select>
+                    <input type="text" name="system.customRolls.{{index}}.formula" value="{{customRoll.formula}}" />
+                    <div class="custom-roll-controls">
+                        <a class="custom-roll-control custom-roll-execute" title="Roll"> <i class="fas fa-dice-d20"></i>Roll</a>
+                        <a class="custom-roll-control custom-roll-delete" title="Delete"> <i class="fas fa-trash"></i>Delete</a>
+                    </div>         
+                </li>
+                {{/each}}
+            </ol>
+            <p>
+                <a class="custom-roll-control custom-roll-add" title="New Custom Roll"><i class="fas fa-plus"></i>New Custom Roll</a>
+            </p>
         </div>
     </section>
 </form>

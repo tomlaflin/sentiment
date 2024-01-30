@@ -1,4 +1,7 @@
-import { AttributeStatus } from "../enums.mjs";
+import {
+    AttributeStatus,
+    RollType
+} from "../enums.mjs";
 
 export const AttributeIdNoSwing = "ATTRIBUTE_ID_NO_SWING";
 
@@ -45,7 +48,14 @@ export class CharacterData extends foundry.abstract.DataModel {
                 defaultTokenImagePath: new foundry.data.fields.StringField({
                     initial: "icons/svg/mystery-man.svg"
                 })
-            })
+            }),
+            customRolls: new foundry.data.fields.ArrayField(new foundry.data.fields.SchemaField({
+                name: new foundry.data.fields.StringField(),
+                rollType: new foundry.data.fields.StringField({
+                    initial: RollType.RollToDo
+                }),
+                formula: new foundry.data.fields.StringField()
+            }))
         };
     }
 }
@@ -409,6 +419,31 @@ export class Character extends Actor {
         if (attributeId === this.system.swing.attributeId) {
             this.dropSwing();
         }
+    }
+
+    /**
+    * Add a new custom roll at the end of the list.
+    */
+    async addCustomRoll() {
+        const newCustomRoll = {
+            name: "New Custom Roll",
+            rollType: RollType.RollToDo,
+            formula: ""
+        };
+
+        let customRolls = this.system.customRolls;
+        customRolls.push(newCustomRoll);
+        return this.update({ "system.customRolls": customRolls});
+    }
+
+    /**
+    * Delete the custom roll at the specified index.
+    * @param index
+    */
+    async deleteCustomRoll(index) {
+        let customRolls = this.system.customRolls;
+        customRolls.splice(index, 1);
+        return this.update({ "system.customRolls": customRolls });
     }
 
     /** @inheritdoc */
