@@ -39,25 +39,32 @@
         </div>
 
         <div class="tab attributes" data-group="primary" data-tab="attributes">
+            <header class="attributes-header flexrow">
+                <span class="attribute-name-column">Name</span>
+                <span class="attribute-color-column">Color</span>
+                <span class="attribute-modifier-column">Modifier</span>
+                <span class="attribute-status-column">Status</span>
+                <span class="attribute-status-controls-column">Controls</span>
+                <span class="attribute-controls-column"/>
+            </header>
             <ol class="list attribute-list">
                 {{#each attributes as |attribute index|}}
                 <li class="attribute list-item flexrow" data-item-id="{{attribute._id}}">
-                    <img class="list-image attribute-image" src="{{attribute.img}}" title="{{attribute.name}}" />
-                    <p class="attribute-name">
+                    <p class="attribute-name attribute-name-column">
                         {{attribute.name}}
                         {{#if attribute.system.descriptiveName}}
                         ({{attribute.system.descriptiveName}})
                         {{/if}}
                     </p>
-                    <p class="attribute-color" style="background-color:{{attribute.system.color}}"/>
-                    <p class="attribute-modifier">+{{attribute.system.modifier}}</p>
-                    <p class="attribute-status">{{attribute.statusString}}</p>
-                    <div class="attribute-status-controls">
+                    <p class="attribute-color attribute-color-column" style="background-color:{{attribute.system.color}}" />
+                    <p class="attribute-modifier attribute-modifier-column">+{{attribute.system.modifier}}</p>
+                    <p class="attribute-status attribute-status-column">{{attribute.statusString}}</p>
+                    <div class="attribute-status-controls attribute-status-controls-column">
                         {{#if attribute.displayRestoreButton}}<button class="button attribute-restore" type="button" title="Restore">Restore</button>{{/if}}
                         {{#if attribute.displayLockOutButton}}<button class="button attribute-lock-out" type="button" title="Lock Out">Lock Out</button>{{/if}}
                         {{#if attribute.displayWoundButton}}<button class="button attribute-wound" type="button" title="Wound">Wound</button>{{/if}}
                     </div>
-                    <div class="attribute-controls">
+                    <div class="attribute-controls attribute-controls-column">
                         <a class="attribute-control attribute-open" title="Open Attribute"> <i class="fas fa-edit"></i> Open</a>
                         <a class="attribute-control attribute-delete" title="Delete Attribute"> <i class="fas fa-trash"></i> Delete</a>
                     </div>
@@ -88,10 +95,10 @@
             <p>
                 <input type="checkbox" class="enable-swing-token-images" id="enable-swing-token-images" name="system.swingTokenImages.enabled" {{checked data.system.swingTokenImages.enabled}} />
                 <label for="enable-swing-token-images">Use Custom Token Images Per Swing</label>
-            {{#if data.system.swingTokenImages.enabled}}
+                {{#if data.system.swingTokenImages.enabled}}
             <p>
                 <label class="custom-token-image-label" for="custom-token-image">Default Token (No Swing):</label>
-                <br/>
+                <br />
                 <img class="custom-token-image" src="{{data.system.swingTokenImages.defaultTokenImagePath}}" data-edit="system.swingTokenImages.defaultTokenImagePath" height="100" width="100" />
             </p>
             {{/if}}
