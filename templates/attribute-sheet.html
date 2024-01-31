@@ -5,6 +5,7 @@
     </header>
     <p>
         <label class="color-label" for="colorPicker"> Color: </label>
+        <br/>
         <input type="color" name="system.color" id="colorPicker" value="{{data.system.color}}" />
     </p>
     <p>
@@ -14,6 +15,7 @@
     {{#if showCustomTokenImage}}
     <p>
         <label class="custom-token-image-label" for="custom-token-image"> Custom Token Image: </label>
+        <br/>
         <img class="custom-token-image" src="{{data.system.customTokenImagePath}}" data-edit="system.customTokenImagePath" height="100" width="100" />
     </p>
     {{/if}}
