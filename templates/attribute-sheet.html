@@ -5,11 +5,11 @@
     </header>
     <p>
         <label class="color-label" for="colorPicker"> Color: </label>
-        <input type="color" name="colorPicker" id="colorPicker" value="{{colorString}}" />
+        <input type="color" name="system.color" id="colorPicker" value="{{data.system.color}}" />
     </p>
     <p>
         <label class="modifier-label" for="modifier"> Modifier: </label>
-        <input type="number" name="system.modifier" id="modifier" value="{{data.system.modifier}}" min="0" data-dtype="Number" />
+        <input type="number" name="system.modifier" id="modifier" value="{{data.system.modifier}}" min="0" />
     </p>
     {{#if showCustomTokenImage}}
     <p>

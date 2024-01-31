@@ -67,7 +67,7 @@ export class Character extends Actor {
 
     static RegisterHandlebarsHelpers() {
         Handlebars.registerHelper('attributeBackgroundColor', function (attribute) {
-            return foundry.utils.Color.fromRGB(attribute?.system.color).toRGBA(0.25) ?? "transparent";
+            return foundry.utils.Color.fromString(attribute?.system.color).toRGBA(0.25) ?? "transparent";
         });
     }
 
