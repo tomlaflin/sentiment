@@ -3,6 +3,9 @@
   "title": "Sentiment",
   "description": "Implementation of the Sentiment TTRPG system for Foundry VTT.",
   "version": "0.1.0",
+  "compatibility": {
+    "verified": "11"
+  },
   "url": "https://github.com/tomlaflin/sentiment",
   "license": "LICENSE.txt",
   "authors": [
