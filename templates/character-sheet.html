@@ -43,7 +43,12 @@
                 {{#each attributes as |attribute index|}}
                 <li class="attribute list-item flexrow" data-item-id="{{attribute._id}}">
                     <img class="list-image attribute-image" src="{{attribute.img}}" title="{{attribute.name}}" />
-                    <h4 class="attribute-name">{{attribute.name}}</h4>
+                    <p class="attribute-name">
+                        {{attribute.name}}
+                        {{#if attribute.system.descriptiveName}}
+                        ({{attribute.system.descriptiveName}})
+                        {{/if}}
+                    </p>
                     <p class="attribute-color" style="background-color:{{attribute.system.color}}"/>
                     <p class="attribute-modifier">+{{attribute.system.modifier}}</p>
                     <p class="attribute-status">{{attribute.statusString}}</p>

@@ -3,6 +3,7 @@ import { AttributeStatus } from "../enums.mjs";
 export class AttributeData extends foundry.abstract.DataModel {
     static defineSchema() {
         return {
+            descriptiveName: new foundry.data.fields.StringField(),
             color: new foundry.data.fields.StringField({
                 initial: "#ffffff"
             }),
