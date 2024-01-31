@@ -1,4 +1,7 @@
-import AttributeData from "./documents/attribute.mjs";
+import {
+    AttributeData,
+    Attribute
+} from "./documents/attribute.mjs";
 import AttributeSheet from "./sheets/attribute-sheet.mjs";
 
 import { GiftData } from "./documents/gift.mjs";
@@ -8,7 +11,6 @@ import {
     CharacterData,
     Character
 } from "./documents/character.mjs";
-
 import CharacterSheet from "./sheets/character-sheet.mjs";
 
 import tryCreateCharacterMacro from "./macro.mjs"
@@ -29,6 +31,8 @@ Hooks.once("init", async function () {
     Actors.unregisterSheet("core", ActorSheet);
     Actors.registerSheet("sentiment", CharacterSheet, { makeDefault: true });
 
+    Attribute.RegisterHandlebarsHelpers();
+    Character.RegisterHandlebarsHelpers();
     CharacterSheet.RegisterHandlebarsHelpers();
 
     await loadTemplates(["systems/sentiment/templates/partials/gift-list.html"]);

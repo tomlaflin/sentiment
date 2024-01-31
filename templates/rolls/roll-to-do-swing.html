@@ -1,6 +1,6 @@
 <h3>Roll to Do!</h3>
 <p>d20 Roll: {{d20Roll}}</p>
-<p>Swing: {{swingValue}} ({{swingAttribute}})</p>
+<p style="background-color:{{attributeBackgroundColor swingAttribute}}">Swing: {{swingValue}} ({{swingAttribute.name}})</p>
 {{#if additionalDice}}
 <p>Additional: {{additionalDice.total}} ({{additionalDice.formula}})</p>
 {{/if}}

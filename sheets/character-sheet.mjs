@@ -10,26 +10,14 @@ import { GiftEquipStatusInitial } from "../documents/gift.mjs"
 const ListSortValueIncrement = 100000;
 
 export default class CharacterSheet extends ActorSheet {
-    
-    #gifts;
 
     static RegisterHandlebarsHelpers() {
-        Handlebars.registerHelper('isStatusNormal', function (attribute) {
-            return attribute.system.status == AttributeStatus.Normal;
-        });
-
-        Handlebars.registerHelper('isStatusLockedOut', function (attribute) {
-            return attribute.system.status == AttributeStatus.LockedOut;
-        });
-
-        Handlebars.registerHelper('isStatusWounded', function (attribute) {
-            return attribute.system.status == AttributeStatus.Wounded;
-        });
-
         Handlebars.registerHelper('toJSON', function (object) {
             return JSON.stringify(object);
         });
     }
+    
+    #gifts;
 
     /** @inheritdoc */
     static get defaultOptions() {

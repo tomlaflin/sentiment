@@ -65,6 +65,12 @@ export class CharacterData extends foundry.abstract.DataModel {
  */
 export class Character extends Actor {
 
+    static RegisterHandlebarsHelpers() {
+        Handlebars.registerHelper('attributeBackgroundColor', function (attribute) {
+            return foundry.utils.Color.fromRGB(attribute?.system.color).toRGBA(0.25) ?? "transparent";
+        });
+    }
+
     /**
     * Returns an array of the character's attributes, culled from the set of all owned items.
     */
@@ -104,7 +110,7 @@ export class Character extends Actor {
             templatePath += "roll-to-do-swing.html";
 
             templateValues.swingValue = swingValue;
-            templateValues.swingAttribute = swingAttribute.name;
+            templateValues.swingAttribute = swingAttribute;
             templateValues.total += swingValue;
         }
         else {
@@ -375,7 +381,7 @@ export class Character extends Actor {
         }
         else {
             templatePath += "roll-to-dye-result-swing.html";
-            templateValues.swingAttributeName = swingAttributeDie.attribute.name;
+            templateValues.swingAttribute = swingAttributeDie.attribute;
             templateValues.swingValue = swingAttributeDie.roll + swingAttributeDie.attribute.system.modifier;
         }
 

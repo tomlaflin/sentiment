@@ -1,6 +1,6 @@
 import { AttributeStatus } from "../enums.mjs";
 
-export default class AttributeData extends foundry.abstract.DataModel {
+export class AttributeData extends foundry.abstract.DataModel {
     static defineSchema() {
         return {
             color: new foundry.data.fields.ArrayField(new foundry.data.fields.NumberField({
@@ -22,5 +22,21 @@ export default class AttributeData extends foundry.abstract.DataModel {
                 initial: "icons/svg/mystery-man.svg"
             })
         };
+    }
+}
+
+export class Attribute {
+    static RegisterHandlebarsHelpers() {
+        Handlebars.registerHelper('isStatusNormal', function (attribute) {
+            return attribute.system.status == AttributeStatus.Normal;
+        });
+
+        Handlebars.registerHelper('isStatusLockedOut', function (attribute) {
+            return attribute.system.status == AttributeStatus.LockedOut;
+        });
+
+        Handlebars.registerHelper('isStatusWounded', function (attribute) {
+            return attribute.system.status == AttributeStatus.Wounded;
+        });
     }
 }

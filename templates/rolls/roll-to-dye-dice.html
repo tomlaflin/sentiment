@@ -1,6 +1,6 @@
 <h3>{{title}}!</h3>
 {{#each attributeDice as |attributeDie|}}
-<p>
+<p style="background-color:{{attributeBackgroundColor attributeDie.attribute}}">
     {{attributeDie.attribute.name}}:
     {{#if (isStatusNormal attributeDie.attribute)}}
         {{attributeDie.roll}} (+{{attributeDie.attribute.system.modifier}})

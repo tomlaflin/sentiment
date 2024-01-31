@@ -2,7 +2,7 @@
 <p>d20 Roll: {{d20Roll}}</p>
 <p>d6 Roll: {{d6Roll}}</p>
 {{#if attribute}}
-<p>Modifier: +{{attribute.system.modifier}} ({{attribute.name}})</p>
+<p style="background-color:{{attributeBackgroundColor attribute}}">Modifier: +{{attribute.system.modifier}} ({{attribute.name}})</p>
 {{/if}}
 {{#if additionalDice}}
 <p>Additional: {{additionalDice.total}} ({{additionalDice.formula}})</p>
