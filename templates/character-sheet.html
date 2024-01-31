@@ -44,8 +44,8 @@
                 <li class="attribute list-item flexrow" data-item-id="{{attribute._id}}">
                     <img class="list-image attribute-image" src="{{attribute.img}}" title="{{attribute.name}}" />
                     <h4 class="attribute-name">{{attribute.name}}</h4>
-                    <p class="attribute-color">{{attribute.system.color}}</p>
-                    <p class="attribute-modifier">{{attribute.system.modifier}}</p>
+                    <p class="attribute-color" style="background-color:{{attribute.system.color}}"/>
+                    <p class="attribute-modifier">+{{attribute.system.modifier}}</p>
                     <p class="attribute-status">{{attribute.statusString}}</p>
                     <div class="attribute-status-controls">
                         {{#if attribute.displayRestoreButton}}<button class="button attribute-restore" type="button" title="Restore">Restore</button>{{/if}}

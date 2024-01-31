@@ -101,6 +101,35 @@
 	margin-right: 5px;
 }
 
+.sentiment .attribute-name {
+	flex-grow: 2;
+}
+
+.sentiment .attribute-color {
+	flex-grow: 1;
+	border: 1px solid black;
+	border-radius: 5px;
+	margin: 5px;
+}
+
+.sentiment .attribute-modifier {
+	flex-grow: 1;
+	font-size: 24px;
+	font-weight: bold;
+}
+
+.sentiment .attribute-status {
+	flex-grow: 1;
+}
+
+.sentiment .attribute-status-controls {
+	flex-grow: 1;
+}
+
+.sentiment .attribute-controls {
+	flex-grow: 2;
+}
+
 .sentiment .custom-rolls-header {
 	position: sticky;
 	top: 0;
