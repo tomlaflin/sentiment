@@ -2,7 +2,7 @@
   "id": "sentiment",
   "title": "Sentiment",
   "description": "Implementation of the Sentiment TTRPG system for Foundry VTT.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "compatibility": {
     "verified": "11"
   },
