@@ -25,11 +25,23 @@ Hooks.once("init", async function () {
     CONFIG.Actor.documentClass = Character;
 
     Items.unregisterSheet("core", ItemSheet);
-    Items.registerSheet("sentiment", AttributeSheet, { makeDefault: true });
-    Items.registerSheet("sentiment", GiftSheet, { makeDefault: true });
+    Items.registerSheet("sentiment", AttributeSheet, {
+        types: ["attribute"],
+        makeDefault: true,
+        label: "Attribute Sheet"
+    });
+    Items.registerSheet("sentiment", GiftSheet, {
+        types: ["gift"],
+        makeDefault: true,
+        label: "Gift Sheet"
+    });
 
     Actors.unregisterSheet("core", ActorSheet);
-    Actors.registerSheet("sentiment", CharacterSheet, { makeDefault: true });
+    Actors.registerSheet("sentiment", CharacterSheet, {
+        types: ["character"],
+        makeDefault: true,
+        label: "Character Sheet"
+    });
 
     Attribute.RegisterHandlebarsHelpers();
     Character.RegisterHandlebarsHelpers();
