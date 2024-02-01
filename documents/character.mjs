@@ -92,7 +92,7 @@ export class Character extends Actor {
     async rollToDo(additionalDiceFormula) {
         const swingAttribute = this.#getSwingAttribute();
         const swingValue = this.system.swing.value;
-
+        
         const d20Roll = await new Roll("1d20").evaluate();
         let templatePath = "systems/sentiment/templates/rolls/";
         let templateValues = {
@@ -490,25 +490,50 @@ export class Character extends Actor {
     /** @inheritdoc */
     _onUpdate(changed, options, userId) {
         const newSwingAttributeId = changed.system?.swing?.attributeId;
+        const newSwingValue = changed.system?.swing?.value;
+
+        if (newSwingValue !== undefined || (newSwingAttributeId && newSwingAttributeId !== AttributeIdNoSwing)) {
+            this.#clampSwingValue(newSwingAttributeId, newSwingValue);
+        }
 
         if (newSwingAttributeId && this.system.swingTokenImages.enabled) {
-            const customTokenImagePath = newSwingAttributeId != AttributeIdNoSwing
-                ? this.items.find((item) => item._id === newSwingAttributeId).system.customTokenImagePath
-                : this.system.swingTokenImages.defaultTokenImagePath;
-
-            const targetTokens = [];
-
-            if (this.isToken) {
-                targetTokens.push(this.token);
-            }
-            else {
-                targetTokens.push(this.prototypeToken);
-                this.getDependentTokens().filter((token) => token.actorLink).forEach((token) => targetTokens.push(token));
-            }
-
-            targetTokens.forEach((token) => token.update({ "texture.src": customTokenImagePath }));
+            this.#updateTokenImages(newSwingAttributeId);
         }
 
         super._onUpdate(changed, options, userId);
+    }
+
+    #clampSwingValue(newSwingAttributeId, newSwingValue) {
+        const swingValue = newSwingValue ?? this.system.swing.value;
+        const swingAttributeId = newSwingAttributeId ?? this.system.swing.attributeId;
+        const swingAttribute = this.items.find((item) => item._id === swingAttributeId);
+
+        const swingMin = swingAttribute.system.modifier + 1;
+        const swingMax = swingAttribute.system.modifier + 6;
+
+        let clampedSwingValue = Math.max(swingValue, swingMin);
+        clampedSwingValue = Math.min(clampedSwingValue, swingMax);
+
+        if (clampedSwingValue !== swingValue) {
+            this.update({ "system.swing.value": clampedSwingValue });
+        }
+    }
+
+    #updateTokenImages(newSwingAttributeId) {
+        const customTokenImagePath = newSwingAttributeId != AttributeIdNoSwing
+            ? this.items.find((item) => item._id === newSwingAttributeId).system.customTokenImagePath
+            : this.system.swingTokenImages.defaultTokenImagePath;
+
+        const targetTokens = [];
+
+        if (this.isToken) {
+            targetTokens.push(this.token);
+        }
+        else {
+            targetTokens.push(this.prototypeToken);
+            this.getDependentTokens().filter((token) => token.actorLink).forEach((token) => targetTokens.push(token));
+        }
+
+        targetTokens.forEach((token) => token.update({ "texture.src": customTokenImagePath }));
     }
 }
