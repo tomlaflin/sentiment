@@ -492,7 +492,7 @@ export class Character extends Actor {
         const newSwingAttributeId = changed.system?.swing?.attributeId;
         const newSwingValue = changed.system?.swing?.value;
 
-        if (newSwingValue !== undefined || (newSwingAttributeId && newSwingAttributeId !== AttributeIdNoSwing)) {
+        if (newSwingValue !== undefined || newSwingAttributeId) {
             this.#clampSwingValue(newSwingAttributeId, newSwingValue);
         }
 
@@ -504,10 +504,14 @@ export class Character extends Actor {
     }
 
     #clampSwingValue(newSwingAttributeId, newSwingValue) {
-        const swingValue = newSwingValue ?? this.system.swing.value;
         const swingAttributeId = newSwingAttributeId ?? this.system.swing.attributeId;
-        const swingAttribute = this.items.find((item) => item._id === swingAttributeId);
+        const swingValue = newSwingValue ?? this.system.swing.value;
 
+        if (swingAttributeId === AttributeIdNoSwing) {
+            return;
+        }
+
+        const swingAttribute = this.items.find((item) => item._id === swingAttributeId);
         const swingMin = swingAttribute.system.modifier + 1;
         const swingMax = swingAttribute.system.modifier + 6;
 
