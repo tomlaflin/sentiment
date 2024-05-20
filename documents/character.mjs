@@ -489,15 +489,18 @@ export class Character extends Actor {
 
     /** @inheritdoc */
     _onUpdate(changed, options, userId) {
-        const newSwingAttributeId = changed.system?.swing?.attributeId;
-        const newSwingValue = changed.system?.swing?.value;
 
-        if (newSwingValue !== undefined || newSwingAttributeId) {
-            this.#clampSwingValue(newSwingAttributeId, newSwingValue);
-        }
+        if (this.isOwner) {
+            const newSwingAttributeId = changed.system?.swing?.attributeId;
+            const newSwingValue = changed.system?.swing?.value;
 
-        if (newSwingAttributeId && this.system.swingTokenImages.enabled) {
-            this.#updateTokenImages(newSwingAttributeId);
+            if (newSwingValue !== undefined || newSwingAttributeId) {
+                this.#clampSwingValue(newSwingAttributeId, newSwingValue);
+            }
+
+            if (newSwingAttributeId && this.system.swingTokenImages.enabled) {
+                this.#updateTokenImages(newSwingAttributeId);
+            }
         }
 
         super._onUpdate(changed, options, userId);
