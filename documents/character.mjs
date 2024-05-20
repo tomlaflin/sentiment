@@ -180,12 +180,12 @@ export class Character extends Actor {
     async #renderToChatMessage(templatePath, args) {
         const html = await renderTemplate(templatePath, args);
         let message = {
-            speaker: {
-                alias: this.name
-            },
+            user: game.user.id,
+            speaker: ChatMessage.getSpeaker({ actor: this }),
             content: html
         };
 
+        ChatMessage.applyRollMode(message, game.settings.get('core', 'rollMode'));
         return ChatMessage.create(message);
     }
 
