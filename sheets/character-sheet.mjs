@@ -375,13 +375,15 @@ export default class CharacterSheet extends ActorSheet {
 
     /** @inheritdoc */
     _onDragStart(event) {
+        super._onDragStart(event);
+
         const draggedGiftHtml = event.target.closest(".gift");
         if (draggedGiftHtml === null) {
-            return super._onDragStart(event);
+            return;
         }
 
         const itemId = draggedGiftHtml.dataset["itemId"];
-        event.dataTransfer.setData("text/plain", JSON.stringify({ giftId: itemId }));
+        event.dataTransfer.setData("gift", JSON.stringify({ giftId: itemId }));
     }
 
     /** @inheritdoc */
@@ -390,7 +392,7 @@ export default class CharacterSheet extends ActorSheet {
 
         let droppedGiftId;
         try {
-            const data = JSON.parse(event.dataTransfer.getData("text/plain"));
+            const data = JSON.parse(event.dataTransfer.getData("gift"));
             droppedGiftId = data.giftId;
         } catch (err) { }
 
