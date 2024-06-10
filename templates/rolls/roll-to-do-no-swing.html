@@ -1,10 +1,41 @@
-<h3>Roll to Do!</h3>
-<p>d20 Roll: {{d20Roll}}</p>
-<p>d6 Roll: {{d6Roll}}</p>
-{{#if attribute}}
-<p style="background-color:{{attributeBackgroundColor attribute}}">Modifier: +{{attribute.system.modifier}} ({{attribute.name}})</p>
-{{/if}}
-{{#if additionalDice}}
-<p>Additional: {{additionalDice.total}} ({{additionalDice.formula}})</p>
-{{/if}}
-<p>Total: {{total}}</p>
+<div class="sentiment">
+    <h3>Roll to Do!</h3>
+    <div class="dice-roll">
+        <div class="dice-result">
+            <div class="dice">
+                <ol class="dice-rolls">
+                    <li class="roll die d20 {{#if critSuccess}}max{{/if}} {{#if critFail}}min{{/if}}">{{d20Roll}}</li>
+                    <li class="roll die d6">{{d6Roll}}</li>
+                    {{#if attribute}}
+                    <li class="roll die attribute-modifier-die" style="background-color:{{attributeBackgroundColor attribute}}">+{{attribute.system.modifier}}</li>
+                    {{/if}}
+                </ol>
+            </div>
+            {{#if additionalDice}}
+            <div class="dice-formula">{{additionalDice.formula}}</div>
+            <div class="dice-tooltip">
+
+
+
+                {{#each additionalDice.dice}}
+                <section class="tooltip-part">
+                    <div class="dice">
+                        <header class="part-header flexrow">
+                            <span class="part-formula">{{this.formula}}</span>
+                            <span class="part-total">{{this.total}}</span>
+                        </header>
+                        <ol class="dice-rolls">
+                            {{#each this.rolls}}
+                            <li class="roll {{this.classes}}">{{{this.result}}}</li>
+                            {{/each}}
+                        </ol>
+                    </div>
+                </section>
+                {{/each}}
+
+            </div>
+            {{/if}}
+            <h4 class="dice-total" {{#if attribute}} style="background-color:{{attributeBackgroundColor attribute}}" {{/if}}>{{total}}</h4>
+        </div>
+    </div>
+</div>

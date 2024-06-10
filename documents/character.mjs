@@ -67,7 +67,7 @@ export class Character extends Actor {
 
     static RegisterHandlebarsHelpers() {
         Handlebars.registerHelper('attributeBackgroundColor', function (attribute) {
-            return foundry.utils.Color.fromString(attribute?.system.color).toRGBA(0.25) ?? "transparent";
+            return attribute ? foundry.utils.Color.fromString(attribute.system.color).toRGBA(0.25) : "transparent";
         });
     }
 
@@ -94,17 +94,15 @@ export class Character extends Actor {
         const swingValue = this.system.swing.value;
         
         const d20Roll = await new Roll("1d20").evaluate();
+        let rolls = [d20Roll];
+
         let templatePath = "systems/sentiment/templates/rolls/";
         let templateValues = {
             d20Roll: d20Roll.total,
-            total: d20Roll.total
+            total: d20Roll.total,
+            critSuccess: d20Roll.total == 20,
+            critFail: d20Roll.total == 1,
         };
-
-        if (additionalDiceFormula) {
-            const additionalDiceRoll = await new Roll(additionalDiceFormula).evaluate();
-            templateValues.additionalDice = additionalDiceRoll;
-            templateValues.total += additionalDiceRoll.total;
-        }
 
         if (swingAttribute) {
             templatePath += "roll-to-do-swing.html";
@@ -117,6 +115,7 @@ export class Character extends Actor {
             templatePath += "roll-to-do-no-swing.html";
 
             const d6Roll = await new Roll("1d6").evaluate();
+            rolls.push(d6Roll);
             templateValues.d6Roll = d6Roll.total;
             templateValues.total += d6Roll.total;
 
@@ -133,7 +132,28 @@ export class Character extends Actor {
             templateValues.total += chosenAttribute?.system.modifier ?? 0;
         }
 
-        return this.#renderToChatMessage(templatePath, templateValues);
+        if (additionalDiceFormula) {
+            const additionalDiceRoll = await new Roll(additionalDiceFormula).evaluate();
+            rolls.push(additionalDiceRoll);
+            templateValues.additionalDice = {
+                formula: additionalDiceRoll.formula,
+                dice: additionalDiceRoll.dice.map(diceTerm => diceTerm.getTooltipData())
+            }
+            templateValues.total += additionalDiceRoll.total;
+        }
+
+        const html = await renderTemplate(templatePath, templateValues);
+        let message = {
+            user: game.user.id,
+            speaker: ChatMessage.getSpeaker({ actor: this }),
+            content: html,
+            type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+            rolls,
+            sound: CONFIG.sounds.dice
+        };
+
+        ChatMessage.applyRollMode(message, game.settings.get('core', 'rollMode'));
+        return ChatMessage.create(message);
     }
 
     /**
