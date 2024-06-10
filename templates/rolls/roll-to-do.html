@@ -5,18 +5,20 @@
             <div class="dice">
                 <ol class="dice-rolls">
                     <li class="roll die d20 {{#if critSuccess}}max{{/if}} {{#if critFail}}min{{/if}}">{{d20Roll}}</li>
+                    {{#if d6Roll}}
                     <li class="roll die d6">{{d6Roll}}</li>
-                    {{#if attribute}}
-                    <li class="roll die attribute-modifier-die" style="background-color:{{attributeBackgroundColor attribute}}">+{{attribute.system.modifier}}</li>
+                    {{/if}}
+                    {{#if attributeModifier}}
+                    <li class="roll die attribute-modifier-die" style="background-color:{{attributeBackgroundColor attribute}}">+{{attributeModifier}}</li>
+                    {{/if}}
+                    {{#if swingValue}}
+                    <li class="roll die attribute-modifier-die" style="background-color:{{attributeBackgroundColor attribute}}">{{swingValue}}</li>
                     {{/if}}
                 </ol>
             </div>
             {{#if additionalDice}}
             <div class="dice-formula">{{additionalDice.formula}}</div>
             <div class="dice-tooltip">
-
-
-
                 {{#each additionalDice.dice}}
                 <section class="tooltip-part">
                     <div class="dice">
@@ -32,7 +34,6 @@
                     </div>
                 </section>
                 {{/each}}
-
             </div>
             {{/if}}
             <h4 class="dice-total" {{#if attribute}} style="background-color:{{attributeBackgroundColor attribute}}" {{/if}}>{{total}}</h4>

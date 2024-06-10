@@ -96,7 +96,7 @@ export class Character extends Actor {
         const d20Roll = await new Roll("1d20").evaluate();
         let rolls = [d20Roll];
 
-        let templatePath = "systems/sentiment/templates/rolls/";
+        let templatePath = "systems/sentiment/templates/rolls/roll-to-do.html";
         let templateValues = {
             d20Roll: d20Roll.total,
             total: d20Roll.total,
@@ -105,15 +105,11 @@ export class Character extends Actor {
         };
 
         if (swingAttribute) {
-            templatePath += "roll-to-do-swing.html";
-
+            templateValues.attribute = swingAttribute;
             templateValues.swingValue = swingValue;
-            templateValues.swingAttribute = swingAttribute;
             templateValues.total += swingValue;
         }
         else {
-            templatePath += "roll-to-do-no-swing.html";
-
             const d6Roll = await new Roll("1d6").evaluate();
             rolls.push(d6Roll);
             templateValues.d6Roll = d6Roll.total;
@@ -129,7 +125,9 @@ export class Character extends Actor {
             }
 
             templateValues.attribute = chosenAttribute;
-            templateValues.total += chosenAttribute?.system.modifier ?? 0;
+            const attributeModifier = chosenAttribute?.system.modifier ?? 0;
+            templateValues.attributeModifier = attributeModifier;
+            templateValues.total += attributeModifier;
         }
 
         if (additionalDiceFormula) {
