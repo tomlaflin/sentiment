@@ -59,7 +59,8 @@
 	width: 25%;
 }
 
-.sentiment .health-bar {
+.sentiment .health-bar,
+.sentiment .roll-to-do-results {
 	display: flex;
 	align-items: center;
 }
@@ -197,4 +198,8 @@
 	min-width: 36px;
 	line-height: 36px;
 	margin: 2px 0;
+}
+
+.sentiment .roll-to-do-results .roll-to-do-result {
+	flex: 50%
 }

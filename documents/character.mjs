@@ -99,7 +99,8 @@ export class Character extends Actor {
         let templatePath = "systems/sentiment/templates/rolls/roll-to-do.html";
         let templateValues = {
             d20Roll: d20Roll.total,
-            total: d20Roll.total,
+            toHit: d20Roll.total,
+            effect: 0,
             critSuccess: d20Roll.total == 20,
             critFail: d20Roll.total == 1,
         };
@@ -107,13 +108,15 @@ export class Character extends Actor {
         if (swingAttribute) {
             templateValues.attribute = swingAttribute;
             templateValues.swingValue = swingValue;
-            templateValues.total += swingValue;
+            templateValues.toHit += swingValue;
+            templateValues.effect += swingValue;
         }
         else {
             const d6Roll = await new Roll("1d6").evaluate();
             rolls.push(d6Roll);
             templateValues.d6Roll = d6Roll.total;
-            templateValues.total += d6Roll.total;
+            templateValues.toHit += d6Roll.total;
+            templateValues.effect += d6Roll.total;
 
             let dialogCanceled = false;
             const chosenAttribute = await this.#renderRollToDoChooseAttributeDialog().catch(() => {
@@ -127,7 +130,8 @@ export class Character extends Actor {
             templateValues.attribute = chosenAttribute;
             const attributeModifier = chosenAttribute?.system.modifier ?? 0;
             templateValues.attributeModifier = attributeModifier;
-            templateValues.total += attributeModifier;
+            templateValues.toHit += attributeModifier;
+            templateValues.effect += attributeModifier;
         }
 
         if (additionalDiceFormula) {
@@ -137,7 +141,7 @@ export class Character extends Actor {
                 formula: additionalDiceRoll.formula,
                 dice: additionalDiceRoll.dice.map(diceTerm => diceTerm.getTooltipData())
             }
-            templateValues.total += additionalDiceRoll.total;
+            templateValues.toHit += additionalDiceRoll.total;
         }
 
         const html = await renderTemplate(templatePath, templateValues);

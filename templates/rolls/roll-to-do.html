@@ -36,7 +36,10 @@
                 {{/each}}
             </div>
             {{/if}}
-            <h4 class="dice-total" {{#if attribute}} style="background-color:{{attributeBackgroundColor attribute}}" {{/if}}>{{total}}</h4>
+            <div class="roll-to-do-results">
+                <h4 class="dice-total roll-to-do-result">To Hit: {{toHit}}</h4>
+                <h4 class="dice-total roll-to-do-result" {{#if attribute}} style="background-color:{{attributeBackgroundColor attribute}}" {{/if}}>Effect: {{effect}}</h4>
+            </div>
         </div>
     </div>
 </div>
