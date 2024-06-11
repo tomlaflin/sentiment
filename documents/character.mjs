@@ -313,11 +313,19 @@ export class Character extends Actor {
             if (attribute._id == swingAttributeDie?.attribute._id) {
                 attributeDice.push(swingAttributeDie);
             }
+            else if (attribute.system.status != AttributeStatus.Normal) {
+                attributeDice.push({
+                    attribute: attribute,
+                    roll: 0,
+                    existing: false
+                });
+            }
             else {
                 const d6Roll = await new Roll("1d6").evaluate();
                 attributeDice.push({
                     attribute: attribute,
                     roll: d6Roll.total,
+                    rollObject: d6Roll,
                     existing: false
                 });
             }
@@ -334,12 +342,36 @@ export class Character extends Actor {
     * @private
     */
     async #renderAttributeDice(rollTitle, attributeDice, additionalDice) {
+        let rolls = [];
+        for (const attributeDie of attributeDice) {
+            if (attributeDie.rollObject) {
+                rolls.push(attributeDie.rollObject);
+            }
+        }
+
+        if (additionalDice) {
+            rolls.push(additionalDice);
+        }
+
         const templatePath = "systems/sentiment/templates/rolls/roll-to-dye-dice.html";
-        return this.#renderToChatMessage(templatePath, {
+        const templateValues = {
             title: rollTitle,
             attributeDice: attributeDice,
             additionalDice: additionalDice
-        });
+        };
+
+        const html = await renderTemplate(templatePath, templateValues);
+        let message = {
+            user: game.user.id,
+            speaker: ChatMessage.getSpeaker({ actor: this }),
+            content: html,
+            type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+            rolls,
+            sound: CONFIG.sounds.dice
+        };
+
+        ChatMessage.applyRollMode(message, game.settings.get('core', 'rollMode'));
+        return ChatMessage.create(message);
     }
 
     /**

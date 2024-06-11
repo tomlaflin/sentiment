@@ -1,19 +1,45 @@
-<h3>{{title}}!</h3>
-{{#each attributeDice as |attributeDie|}}
-<p style="background-color:{{attributeBackgroundColor attributeDie.attribute}}">
-    {{attributeDie.attribute.name}}:
-    {{#if (isStatusNormal attributeDie.attribute)}}
-        {{attributeDie.roll}} (+{{attributeDie.attribute.system.modifier}})
-    {{/if}}
-    {{#if (isStatusLockedOut attributeDie.attribute)}}
-        Locked Out
-    {{/if}}
-    {{#if (isStatusWounded attributeDie.attribute)}}
-        Wounded
-    {{/if}}
-    {{#if attributeDie.existing}} (Existing Swing){{/if}}
-</p>
-{{/each}}
-{{#if additionalDice}}
-<p>Additional: {{additionalDice.total}} ({{additionalDice.formula}})</p>
-{{/if}}
+<div class="sentiment">
+    <h3>{{title}}!</h3>
+    <div class="dice-roll">
+        <div class="dice-result">
+            {{#each attributeDice as |attributeDie|}}
+            <div class="dice">
+                <ol class="dice-rolls">
+                    {{#if (isStatusNormal attributeDie.attribute)}}
+                    <li class="roll die d6">{{attributeDie.roll}}</li>
+                    <li class="roll die attribute-modifier-die" style="background-color:{{attributeBackgroundColor attributeDie.attribute}}">+{{attributeDie.attribute.system.modifier}}</li>
+                    {{/if}}
+                    {{#if (isStatusLockedOut attributeDie.attribute)}}
+                    <li class="roll die d6">-</li>
+                    <li class="roll die attribute-modifier-die" style="background-color:{{attributeBackgroundColor attributeDie.attribute}}">L</li>
+                    {{/if}}
+                    {{#if (isStatusWounded attributeDie.attribute)}}
+                    <li class="roll die d6">-</li>
+                    <li class="roll die attribute-modifier-die" style="background-color:{{attributeBackgroundColor attributeDie.attribute}}">W</li>
+                    {{/if}}
+                </ol>
+            </div>
+            {{/each}}
+            {{#if additionalDice}}
+            <div class="dice-formula">{{additionalDice.formula}}</div>
+            <div class="dice-tooltip">
+                {{#each additionalDice.dice}}
+                <section class="tooltip-part">
+                    <div class="dice">
+                        <header class="part-header flexrow">
+                            <span class="part-formula">{{this.formula}}</span>
+                            <span class="part-total">{{this.total}}</span>
+                        </header>
+                        <ol class="dice-rolls">
+                            {{#each this.rolls}}
+                            <li class="roll {{this.classes}}">{{{this.result}}}</li>
+                            {{/each}}
+                        </ol>
+                    </div>
+                </section>
+                {{/each}}
+            </div>
+            {{/if}}
+        </div>
+    </div>
+</div>
