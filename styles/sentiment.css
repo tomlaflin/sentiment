@@ -181,6 +181,16 @@
 	background-image: url(../../../icons/svg/d20-grey.svg);
 }
 
+.sentiment .dice-rolls .max {
+	color: #18520b;
+	filter: sepia(0.5) hue-rotate(60deg);
+}
+
+.sentiment .dice-rolls .min {
+	color: #aa0200;
+	filter: sepia(0.5) hue-rotate(-60deg);
+}
+
 .sentiment .dice-rolls .attribute-modifier-die {
 	background:none;
 	border-radius: 18px;
