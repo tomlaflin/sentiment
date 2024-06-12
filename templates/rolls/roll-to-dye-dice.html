@@ -8,6 +8,7 @@
                     {{#if (isStatusNormal attributeDie.attribute)}}
                     <li class="roll die d6">{{attributeDie.roll}}</li>
                     <li class="roll die attribute-modifier-die" style="background-color:{{attributeBackgroundColor attributeDie.attribute}}">+{{attributeDie.attribute.system.modifier}}</li>
+                    {{#if attributeDie.existing}} <li class="existing-swing-text">(Existing Swing)</li>{{/if}}
                     {{/if}}
                     {{#if (isStatusLockedOut attributeDie.attribute)}}
                     <li class="roll die d6">-</li>

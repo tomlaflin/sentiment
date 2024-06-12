@@ -159,7 +159,8 @@
 	overflow: hidden;
 }
 
-.sentiment .dice-rolls .roll {
+.sentiment .dice-rolls .roll,
+.sentiment .existing-swing-text {
 	min-width: 36px;
 	line-height: 36px;
 	margin-right: 5px;
@@ -194,7 +195,7 @@
 
 .sentiment .dice-rolls .attribute-modifier-die {
 	background: none;
-	margin: 2px 0;
+	margin: 2px 5px 2px 0;
 }
 
 .sentiment .dice-rolls .attribute-modifier-die,
