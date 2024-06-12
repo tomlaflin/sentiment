@@ -193,11 +193,30 @@
 }
 
 .sentiment .dice-rolls .attribute-modifier-die {
-	background:none;
+	background: none;
+	margin: 2px 0;
+}
+
+.sentiment .dice-rolls .attribute-modifier-die,
+.sentiment .swing {
 	border-radius: 18px;
 	min-width: 36px;
 	line-height: 36px;
-	margin: 2px 0;
+}
+
+.sentiment .chosen-swing-text {
+	margin: 5px 0;
+	color: #000;
+	font-size: var(--font-size-24);
+	font-weight: bold;
+	text-align: center;
+	line-height: 36px;
+}
+
+.sentiment .swing {
+	display: inline-block;
+	position: relative;
+	background-repeat: no-repeat;
 }
 
 .sentiment .roll-to-do-results .roll-to-do-result {

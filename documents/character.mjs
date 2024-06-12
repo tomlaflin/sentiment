@@ -424,17 +424,13 @@ export class Character extends Actor {
     * @private
     */
     async #renderRollToDyeResult(rollTitle, total, swingAttributeDie) {
-        let templatePath = "systems/sentiment/templates/rolls/";
+        let templatePath = "systems/sentiment/templates/rolls/roll-to-dye-result-swing.html";
         let templateValues = {
             title: rollTitle,
             total: total
         };
 
-        if (swingAttributeDie === null) {
-            templatePath += "roll-to-dye-result-no-swing.html";
-        }
-        else {
-            templatePath += "roll-to-dye-result-swing.html";
+        if (swingAttributeDie !== null) {
             templateValues.swingAttribute = swingAttributeDie.attribute;
             templateValues.swingValue = swingAttributeDie.roll + swingAttributeDie.attribute.system.modifier;
         }
