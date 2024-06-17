@@ -1,0 +1,15 @@
+<div class="sentiment">
+    <h3>{{title}} Result</h3>
+    <div class="dice-roll">
+        <div class="dice-result">
+            <h4 class="dice-total">{{total}}</h4>
+        </div>
+    </div>
+    <h4 class="chosen-swing-text">Chosen Swing: 
+        {{#if swingAttribute}}
+        <span class="swing" style="background-color:{{attributeBackgroundColor swingAttribute}}">{{swingValue}}</span>
+        {{else}}
+        None
+        {{/if}}
+    </h4>
+</div>

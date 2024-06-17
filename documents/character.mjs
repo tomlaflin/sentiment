@@ -67,7 +67,7 @@ export class Character extends Actor {
 
     static RegisterHandlebarsHelpers() {
         Handlebars.registerHelper('attributeBackgroundColor', function (attribute) {
-            return foundry.utils.Color.fromString(attribute?.system.color).toRGBA(0.25) ?? "transparent";
+            return attribute ? foundry.utils.Color.fromString(attribute.system.color).toRGBA(0.25) : "transparent";
         });
     }
 
@@ -94,31 +94,29 @@ export class Character extends Actor {
         const swingValue = this.system.swing.value;
         
         const d20Roll = await new Roll("1d20").evaluate();
-        let templatePath = "systems/sentiment/templates/rolls/";
+        let rolls = [d20Roll];
+
+        const templatePath = "systems/sentiment/templates/rolls/roll-to-do.html";
         let templateValues = {
             d20Roll: d20Roll.total,
-            total: d20Roll.total
+            toHit: d20Roll.total,
+            effect: 0,
+            critSuccess: d20Roll.total == 20,
+            critFail: d20Roll.total == 1,
         };
 
-        if (additionalDiceFormula) {
-            const additionalDiceRoll = await new Roll(additionalDiceFormula).evaluate();
-            templateValues.additionalDice = additionalDiceRoll;
-            templateValues.total += additionalDiceRoll.total;
-        }
-
         if (swingAttribute) {
-            templatePath += "roll-to-do-swing.html";
-
+            templateValues.attribute = swingAttribute;
             templateValues.swingValue = swingValue;
-            templateValues.swingAttribute = swingAttribute;
-            templateValues.total += swingValue;
+            templateValues.toHit += swingValue;
+            templateValues.effect += swingValue;
         }
         else {
-            templatePath += "roll-to-do-no-swing.html";
-
             const d6Roll = await new Roll("1d6").evaluate();
+            rolls.push(d6Roll);
             templateValues.d6Roll = d6Roll.total;
-            templateValues.total += d6Roll.total;
+            templateValues.toHit += d6Roll.total;
+            templateValues.effect += d6Roll.total;
 
             let dialogCanceled = false;
             const chosenAttribute = await this.#renderRollToDoChooseAttributeDialog().catch(() => {
@@ -130,10 +128,23 @@ export class Character extends Actor {
             }
 
             templateValues.attribute = chosenAttribute;
-            templateValues.total += chosenAttribute?.system.modifier ?? 0;
+            const attributeModifier = chosenAttribute?.system.modifier ?? 0;
+            templateValues.attributeModifier = "+" + attributeModifier;
+            templateValues.toHit += attributeModifier;
+            templateValues.effect += attributeModifier;
         }
 
-        return this.#renderToChatMessage(templatePath, templateValues);
+        if (additionalDiceFormula) {
+            const additionalDiceRoll = await new Roll(additionalDiceFormula).evaluate();
+            rolls.push(additionalDiceRoll);
+            templateValues.additionalDice = {
+                formula: additionalDiceRoll.formula,
+                dice: additionalDiceRoll.dice.map(diceTerm => diceTerm.getTooltipData())
+            }
+            templateValues.toHit += additionalDiceRoll.total;
+        }
+
+        return this.#renderRollMessage(templatePath, templateValues, rolls);
     }
 
     /**
@@ -175,9 +186,10 @@ export class Character extends Actor {
     * Render an HTML template with arguments as a chat message with this character as the speaker.
     * @param templatePath
     * @param args
+    * @param messageOptions
     * @private
     */
-    async #renderToChatMessage(templatePath, args) {
+    async #renderToChatMessage(templatePath, args, messageOptions = {}) {
         const html = await renderTemplate(templatePath, args);
         let message = {
             user: game.user.id,
@@ -185,8 +197,27 @@ export class Character extends Actor {
             content: html
         };
 
+        message = foundry.utils.mergeObject(message, messageOptions);
         ChatMessage.applyRollMode(message, game.settings.get('core', 'rollMode'));
+
         return ChatMessage.create(message);
+    }
+
+    /**
+     * Render an HTML template with arguments as a roll-containing chat message with this character as the speaker.
+     * @param templatePath
+     * @param args
+     * @param rolls
+     * @private
+     */
+    async #renderRollMessage(templatePath, args, rolls) {
+        const messageOptions = {
+            type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+            sound: CONFIG.sounds.dice,
+            rolls
+        }
+
+        return this.#renderToChatMessage(templatePath, args, messageOptions);
     }
 
     /**
@@ -291,11 +322,19 @@ export class Character extends Actor {
             if (attribute._id == swingAttributeDie?.attribute._id) {
                 attributeDice.push(swingAttributeDie);
             }
+            else if (attribute.system.status != AttributeStatus.Normal) {
+                attributeDice.push({
+                    attribute: attribute,
+                    roll: 0,
+                    existing: false
+                });
+            }
             else {
                 const d6Roll = await new Roll("1d6").evaluate();
                 attributeDice.push({
                     attribute: attribute,
                     roll: d6Roll.total,
+                    rollObject: d6Roll,
                     existing: false
                 });
             }
@@ -312,12 +351,20 @@ export class Character extends Actor {
     * @private
     */
     async #renderAttributeDice(rollTitle, attributeDice, additionalDice) {
+        let rolls = attributeDice.filter((attributeDie) => attributeDie.rollObject).map((attributeDie) => attributeDie.rollObject);
+
+        if (additionalDice) {
+            rolls.push(additionalDice);
+        }
+
         const templatePath = "systems/sentiment/templates/rolls/roll-to-dye-dice.html";
-        return this.#renderToChatMessage(templatePath, {
+        const templateValues = {
             title: rollTitle,
             attributeDice: attributeDice,
             additionalDice: additionalDice
-        });
+        };
+
+        return this.#renderRollMessage(templatePath, templateValues, rolls);
     }
 
     /**
@@ -370,17 +417,13 @@ export class Character extends Actor {
     * @private
     */
     async #renderRollToDyeResult(rollTitle, total, swingAttributeDie) {
-        let templatePath = "systems/sentiment/templates/rolls/";
+        const templatePath = "systems/sentiment/templates/rolls/roll-to-dye-result.html";
         let templateValues = {
             title: rollTitle,
             total: total
         };
 
-        if (swingAttributeDie === null) {
-            templatePath += "roll-to-dye-result-no-swing.html";
-        }
-        else {
-            templatePath += "roll-to-dye-result-swing.html";
+        if (swingAttributeDie !== null) {
             templateValues.swingAttribute = swingAttributeDie.attribute;
             templateValues.swingValue = swingAttributeDie.roll + swingAttributeDie.attribute.system.modifier;
         }

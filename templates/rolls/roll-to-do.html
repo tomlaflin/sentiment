@@ -1,26 +1,21 @@
 <div class="sentiment">
-    <h3>{{title}}!</h3>
+    <h3>Roll to Do!</h3>
     <div class="dice-roll">
         <div class="dice-result">
-            {{#each attributeDice as |attributeDie|}}
             <div class="dice">
                 <ol class="dice-rolls">
-                    {{#if (isStatusNormal attributeDie.attribute)}}
-                    <li class="roll die d6">{{attributeDie.roll}}</li>
-                    <li class="roll die attribute-modifier-die" style="background-color:{{attributeBackgroundColor attributeDie.attribute}}">+{{attributeDie.attribute.system.modifier}}</li>
-                    {{#if attributeDie.existing}} <li class="existing-swing-text">(Existing Swing)</li>{{/if}}
+                    <li class="roll die d20 {{#if critSuccess}}max{{/if}} {{#if critFail}}min{{/if}}">{{d20Roll}}</li>
+                    {{#if d6Roll}}
+                    <li class="roll die d6">{{d6Roll}}</li>
                     {{/if}}
-                    {{#if (isStatusLockedOut attributeDie.attribute)}}
-                    <li class="roll die d6">-</li>
-                    <li class="roll die attribute-modifier-die" style="background-color:{{attributeBackgroundColor attributeDie.attribute}}">L</li>
+                    {{#if attributeModifier}}
+                    <li class="roll die attribute-modifier-die" style="background-color:{{attributeBackgroundColor attribute}}">{{attributeModifier}}</li>
                     {{/if}}
-                    {{#if (isStatusWounded attributeDie.attribute)}}
-                    <li class="roll die d6">-</li>
-                    <li class="roll die attribute-modifier-die" style="background-color:{{attributeBackgroundColor attributeDie.attribute}}">W</li>
+                    {{#if swingValue}}
+                    <li class="roll die attribute-modifier-die" style="background-color:{{attributeBackgroundColor attribute}}">{{swingValue}}</li>
                     {{/if}}
                 </ol>
             </div>
-            {{/each}}
             {{#if additionalDice}}
             <div class="dice-formula">{{additionalDice.formula}}</div>
             <div class="dice-tooltip">
@@ -41,6 +36,10 @@
                 {{/each}}
             </div>
             {{/if}}
+            <div class="roll-to-do-results">
+                <h4 class="dice-total roll-to-do-result">To Hit: {{toHit}}</h4>
+                <h4 class="dice-total roll-to-do-result" {{#if attribute}} style="background-color:{{attributeBackgroundColor attribute}}" {{/if}}>Effect: {{effect}}</h4>
+            </div>
         </div>
     </div>
 </div>

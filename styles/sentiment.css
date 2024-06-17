@@ -59,7 +59,8 @@
 	width: 25%;
 }
 
-.sentiment .health-bar {
+.sentiment .health-bar,
+.sentiment .roll-to-do-results {
 	display: flex;
 	align-items: center;
 }
@@ -119,8 +120,8 @@
 	flex-grow: 1;
 }
 
-.sentiment .attribute-modifier {
-	font-size: 24px;
+.sentiment .attribute-modifier-text {
+	font-size: var(--font-size-20);
 	font-weight: bold;
 }
 
@@ -149,4 +150,76 @@
 	border-radius: 2px;
 	text-align: left;
 	font-weight: bold;
+}
+
+.sentiment .dice-rolls {
+	list-style: none;
+	margin: 5px 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+.sentiment .dice-rolls .roll,
+.sentiment .existing-swing-text {
+	min-width: 36px;
+	line-height: 36px;
+	margin-right: 5px;
+	background-size: 36px 36px;
+	font-size: var(--font-size-20);
+
+	position: relative;
+    float: left;
+    background-repeat: no-repeat;
+    color: #000;
+    font-weight: bold;
+    text-align: center;
+}
+
+.sentiment .dice-rolls .d6 {
+	background-image: url(../../../icons/svg/d6-grey.svg);
+}
+
+.sentiment .dice-rolls .d20 {
+	background-image: url(../../../icons/svg/d20-grey.svg);
+}
+
+.sentiment .dice-rolls .max {
+	color: #18520b;
+	filter: sepia(0.5) hue-rotate(60deg);
+}
+
+.sentiment .dice-rolls .min {
+	color: #aa0200;
+	filter: sepia(0.5) hue-rotate(-60deg);
+}
+
+.sentiment .dice-rolls .attribute-modifier-die {
+	background: none;
+	margin: 2px 5px 2px 0;
+}
+
+.sentiment .dice-rolls .attribute-modifier-die,
+.sentiment .swing {
+	border-radius: 16px;
+	min-width: 32px;
+	line-height: 32px;
+}
+
+.sentiment .chosen-swing-text {
+	margin: 5px 0;
+	color: #000;
+	font-size: var(--font-size-20);
+	font-weight: bold;
+	text-align: center;
+	line-height: 32px;
+}
+
+.sentiment .swing {
+	display: inline-block;
+	position: relative;
+	background-repeat: no-repeat;
+}
+
+.sentiment .roll-to-do-results .roll-to-do-result {
+	flex: 50%
 }
