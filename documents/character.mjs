@@ -351,12 +351,7 @@ export class Character extends Actor {
     * @private
     */
     async #renderAttributeDice(rollTitle, attributeDice, additionalDice) {
-        let rolls = [];
-        for (const attributeDie of attributeDice) {
-            if (attributeDie.rollObject) {
-                rolls.push(attributeDie.rollObject);
-            }
-        }
+        let rolls = attributeDice.filter((attributeDie) => attributeDie.rollObject).map((attributeDie) => attributeDie.rollObject);
 
         if (additionalDice) {
             rolls.push(additionalDice);
@@ -422,7 +417,7 @@ export class Character extends Actor {
     * @private
     */
     async #renderRollToDyeResult(rollTitle, total, swingAttributeDie) {
-        const templatePath = "systems/sentiment/templates/rolls/roll-to-dye-result-swing.html";
+        const templatePath = "systems/sentiment/templates/rolls/roll-to-dye-result.html";
         let templateValues = {
             title: rollTitle,
             total: total
