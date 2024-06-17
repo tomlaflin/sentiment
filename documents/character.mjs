@@ -96,7 +96,7 @@ export class Character extends Actor {
         const d20Roll = await new Roll("1d20").evaluate();
         let rolls = [d20Roll];
 
-        let templatePath = "systems/sentiment/templates/rolls/roll-to-do.html";
+        const templatePath = "systems/sentiment/templates/rolls/roll-to-do.html";
         let templateValues = {
             d20Roll: d20Roll.total,
             toHit: d20Roll.total,
@@ -144,18 +144,7 @@ export class Character extends Actor {
             templateValues.toHit += additionalDiceRoll.total;
         }
 
-        const html = await renderTemplate(templatePath, templateValues);
-        let message = {
-            user: game.user.id,
-            speaker: ChatMessage.getSpeaker({ actor: this }),
-            content: html,
-            type: CONST.CHAT_MESSAGE_TYPES.ROLL,
-            rolls,
-            sound: CONFIG.sounds.dice
-        };
-
-        ChatMessage.applyRollMode(message, game.settings.get('core', 'rollMode'));
-        return ChatMessage.create(message);
+        return this.#renderRollMessage(templatePath, templateValues, rolls);
     }
 
     /**
@@ -197,9 +186,10 @@ export class Character extends Actor {
     * Render an HTML template with arguments as a chat message with this character as the speaker.
     * @param templatePath
     * @param args
+    * @param messageOptions
     * @private
     */
-    async #renderToChatMessage(templatePath, args) {
+    async #renderToChatMessage(templatePath, args, messageOptions = {}) {
         const html = await renderTemplate(templatePath, args);
         let message = {
             user: game.user.id,
@@ -207,8 +197,27 @@ export class Character extends Actor {
             content: html
         };
 
+        message = foundry.utils.mergeObject(message, messageOptions);
         ChatMessage.applyRollMode(message, game.settings.get('core', 'rollMode'));
+
         return ChatMessage.create(message);
+    }
+
+    /**
+     * Render an HTML template with arguments as a roll-containing chat message with this character as the speaker.
+     * @param templatePath
+     * @param args
+     * @param rolls
+     * @private
+     */
+    async #renderRollMessage(templatePath, args, rolls) {
+        const messageOptions = {
+            type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+            sound: CONFIG.sounds.dice,
+            rolls
+        }
+
+        return this.#renderToChatMessage(templatePath, args, messageOptions);
     }
 
     /**
@@ -360,18 +369,7 @@ export class Character extends Actor {
             additionalDice: additionalDice
         };
 
-        const html = await renderTemplate(templatePath, templateValues);
-        let message = {
-            user: game.user.id,
-            speaker: ChatMessage.getSpeaker({ actor: this }),
-            content: html,
-            type: CONST.CHAT_MESSAGE_TYPES.ROLL,
-            rolls,
-            sound: CONFIG.sounds.dice
-        };
-
-        ChatMessage.applyRollMode(message, game.settings.get('core', 'rollMode'));
-        return ChatMessage.create(message);
+        return this.#renderRollMessage(templatePath, templateValues, rolls);
     }
 
     /**
@@ -424,7 +422,7 @@ export class Character extends Actor {
     * @private
     */
     async #renderRollToDyeResult(rollTitle, total, swingAttributeDie) {
-        let templatePath = "systems/sentiment/templates/rolls/roll-to-dye-result-swing.html";
+        const templatePath = "systems/sentiment/templates/rolls/roll-to-dye-result-swing.html";
         let templateValues = {
             title: rollTitle,
             total: total
