@@ -9,7 +9,7 @@
                     <li class="roll die d6">{{d6Roll}}</li>
                     {{/if}}
                     {{#if attributeModifier}}
-                    <li class="roll die attribute-modifier-die" style="background-color:{{attributeBackgroundColor attribute}}">+{{attributeModifier}}</li>
+                    <li class="roll die attribute-modifier-die" style="background-color:{{attributeBackgroundColor attribute}}">{{attributeModifier}}</li>
                     {{/if}}
                     {{#if swingValue}}
                     <li class="roll die attribute-modifier-die" style="background-color:{{attributeBackgroundColor attribute}}">{{swingValue}}</li>

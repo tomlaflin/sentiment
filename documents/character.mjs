@@ -129,7 +129,7 @@ export class Character extends Actor {
 
             templateValues.attribute = chosenAttribute;
             const attributeModifier = chosenAttribute?.system.modifier ?? 0;
-            templateValues.attributeModifier = attributeModifier;
+            templateValues.attributeModifier = "+" + attributeModifier;
             templateValues.toHit += attributeModifier;
             templateValues.effect += attributeModifier;
         }
