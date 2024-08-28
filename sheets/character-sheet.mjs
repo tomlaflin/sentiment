@@ -22,7 +22,7 @@ export default class CharacterSheet extends ActorSheet {
     /** @inheritdoc */
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
-            classes: ["sentiment", "sheet"],
+            classes: ["sentiment", "sheet", "character"],
             template: "systems/sentiment/templates/character-sheet.html",
             tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "description" }],
             dragDrop: [

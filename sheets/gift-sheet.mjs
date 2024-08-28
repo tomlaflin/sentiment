@@ -3,10 +3,8 @@ export default class GiftSheet extends ItemSheet {
     /** @inheritdoc */
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
-            classes: ["sentiment", "sheet"],
-            template: "systems/sentiment/templates/gift-sheet.html",
-            width: 600,
-            height: 600
+            classes: ["sentiment", "sheet", "gift"],
+            template: "systems/sentiment/templates/gift-sheet.html"
         });
     }
     

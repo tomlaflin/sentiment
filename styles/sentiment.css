@@ -4,12 +4,11 @@
 	overflow-y: hidden;
 }
 
-.sentiment .form {
+.sentiment form {
 	height: 100%;
 }
 
 .sentiment .sheet-header {
-	flex: 0 0 100px;
 	overflow: hidden;
 	display: flex;
 	flex-direction: row;
@@ -18,9 +17,25 @@
 	margin-bottom: 10px;
 }
 
+.sentiment.sheet.character .sheet-header {
+	flex: 0 0 100px;
+}
+
+.sentiment.sheet.attribute .sheet-header,
+.sentiment.sheet.gift .sheet-header {
+	flex: 0 0 64px;
+}
+
 .sentiment .sheet-header .character-image {
 	flex: 0 0 100px;
 	height: 100px;
+	margin-right: 10px;
+}
+
+.sentiment .sheet-header .attribute-image,
+.sentiment .sheet-header .gift-image {
+	flex: 0 0 64px;
+	height: 64px;
 	margin-right: 10px;
 }
 
@@ -37,6 +52,13 @@
 	width: 100%;
 	height: 100%;
 	margin: 0 0 5px 0;
+}
+
+.sentiment .sheet-header .attribute-name,
+.sentiment .sheet-header .gift-name {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
 }
 
 .sentiment .header-row {
@@ -72,12 +94,33 @@
 
 .sentiment .sheet-body,
 .sentiment .section .sheet-body,
-.sentiment .sheet-body .tab,
 .sentiment .sheet-body .tab .editor,
 .sentiment .sheet-body .description,
 .sentiment .editor,
 .sentiment .editor-content {
 	height: 100%;
+}
+
+.sentiment .sheet-body {
+	overflow: hidden;
+}
+
+.sentiment .tabs {
+	flex: 0 0 32px;
+}
+
+.sentiment .tabs .item.active {
+	font-weight: bold;
+	text-shadow: none;
+}
+
+.sentiment .sheet-body .tab {
+	height: 100%;
+	overflow-y: auto;
+}
+
+.sentiment button {
+	margin: 0px;
 }
 
 .sentiment .list {
