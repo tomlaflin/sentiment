@@ -1,4 +1,4 @@
-import { RollType } from "../enums.mjs";
+import { RollTypes } from "../enums.mjs";
 
 export default class CustomRollSheet extends ItemSheet {
 
@@ -13,7 +13,7 @@ export default class CustomRollSheet extends ItemSheet {
     /** @inheritdoc */
     async getData(options) {
         const context = await super.getData(options);
-        context.RollType = RollType;
+        context.RollTypes = RollTypes;
         return context;
     }
 }

@@ -9,9 +9,9 @@
                 <br />
                 <select class="custom-roll-type-selector" name="system.rollType" id="rollType">
                     {{#select data.system.rollType}}
-                    <option value="{{RollType.RollToDo}}">Roll to Do</option>
-                    <option value="{{RollType.RollToDye}}">Roll to Dye</option>
-                    <option value="{{RollType.RecoveryRoll}}">Recovery Roll</option>
+                    <option value="RollToDo">{{RollTypes.RollToDo.DisplayName}}</option>
+                    <option value="RollToDye">{{RollTypes.RollToDye.DisplayName}}</option>
+                    <option value="RecoveryRoll">{{RollTypes.RecoveryRoll.DisplayName}}</option>
                     {{/select}}
                 </select>
             </p>

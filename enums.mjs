@@ -12,9 +12,18 @@ export const GiftEquipStatus = Object.freeze({
     Primary: 2
 });
 
-// Enum type for the game's various rolls.
-export const RollType = Object.freeze({
-    RollToDo: "rollToDo",
-    RollToDye: "rollToDye",
-    RecoveryRoll: "recoveryRoll"
+// The game's core roll types and their associated strings.
+export const RollTypes = Object.freeze({
+    RollToDo: {
+        DisplayName: "Roll To Do",
+        FunctionName: "rollToDo"
+    },
+    RollToDye: {
+        DisplayName: "Roll To Dye",
+        FunctionName: "rollToDye"
+    },
+    RecoveryRoll: {
+        DisplayName: "Recovery Roll",
+        FunctionName: "recoveryRoll"
+    }
 });

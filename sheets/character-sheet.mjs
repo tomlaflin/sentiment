@@ -1,7 +1,7 @@
 import {
     AttributeStatus,
     GiftEquipStatus,
-    RollType
+    RollTypes
 } from "../enums.mjs";
 
 import { AttributeIdNoSwing } from "../documents/character.mjs"
@@ -151,7 +151,7 @@ export default class CharacterSheet extends ActorSheet {
     async #populateConstants(context) {
         context.AttributeIdNoSwing = AttributeIdNoSwing;
         context.GiftEquipStatus = GiftEquipStatus;
-        context.RollType = RollType;
+        context.RollTypes = RollTypes;
     }
 
     /** @inheritdoc */
