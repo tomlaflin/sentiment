@@ -1,4 +1,7 @@
-import { AttributeStatus } from "../enums.mjs";
+import {
+    AttributeStatus,
+    RollTypes
+} from "../enums.mjs";
 
 export const AttributeIdNoSwing = "ATTRIBUTE_ID_NO_SWING";
 
@@ -471,6 +474,20 @@ export class Character extends Actor {
         if (attributeId === this.system.swing.attributeId) {
             this.dropSwing();
         }
+    }
+
+    /**
+    * Executes the specified custom roll.
+    * @param customRollId
+    */
+    async executeCustomRoll(customRollId) {
+        const customRoll = this.items.find((item) => item._id === customRollId);
+        if (!customRoll) {
+            throw new Error("Custom Roll with ID " + customRollId + " not found on Character with ID " + this._id);
+        }
+
+        const rollFunction = RollTypes[customRoll.system.rollType].FunctionName;
+        return this[rollFunction](customRoll.system.formulaAddedToHit);
     }
 
     /** @inheritdoc */

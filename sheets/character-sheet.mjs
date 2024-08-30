@@ -398,7 +398,8 @@ export default class CharacterSheet extends ActorSheet {
     async #onCustomRollExecute(event) {
         event.preventDefault();
 
-        // NYI
+        const customRoll = this.#getItemFromListEvent(event);
+        this.object.executeCustomRoll(customRoll._id);
     }
 
     /** @inheritdoc */
