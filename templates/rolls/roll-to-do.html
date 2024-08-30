@@ -16,10 +16,30 @@
                     {{/if}}
                 </ol>
             </div>
-            {{#if additionalDice}}
-            <div class="dice-formula">{{additionalDice.formula}}</div>
+            {{#if additionalDiceToHit}}
+            <div class="dice-formula">Bonus to Hit: {{additionalDiceToHit.formula}}</div>
             <div class="dice-tooltip">
-                {{#each additionalDice.dice}}
+                {{#each additionalDiceToHit.dice}}
+                <section class="tooltip-part">
+                    <div class="dice">
+                        <header class="part-header flexrow">
+                            <span class="part-formula">{{this.formula}}</span>
+                            <span class="part-total">{{this.total}}</span>
+                        </header>
+                        <ol class="dice-rolls">
+                            {{#each this.rolls}}
+                            <li class="roll {{this.classes}}">{{{this.result}}}</li>
+                            {{/each}}
+                        </ol>
+                    </div>
+                </section>
+                {{/each}}
+            </div>
+            {{/if}}
+            {{#if additionalDiceToEffect}}
+            <div class="dice-formula">Bonus to Effect: {{additionalDiceToEffect.formula}}</div>
+            <div class="dice-tooltip">
+                {{#each additionalDiceToEffect.dice}}
                 <section class="tooltip-part">
                     <div class="dice">
                         <header class="part-header flexrow">

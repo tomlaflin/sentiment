@@ -14,6 +14,8 @@ export default class CustomRollSheet extends ItemSheet {
     async getData(options) {
         const context = await super.getData(options);
         context.RollTypes = RollTypes;
+        context.showToHit = context.data.system.rollType === "RollToDo";
+
         return context;
     }
 }

@@ -139,6 +139,7 @@ export default class CharacterSheet extends ActorSheet {
         for (let item of context.items) {
             if (item.type == "customRoll") {
                 context.customRolls.push(item);
+                item.showToHit = item.system.rollType === "RollToDo";
             }
         }
     }

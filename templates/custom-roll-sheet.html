@@ -15,10 +15,12 @@
                     {{/select}}
                 </select>
             </p>
+            {{#if showToHit}}
             <p>
                 <label class="custom-roll-to-hit-label" for="toHit">Bonus to Hit:</label>
                 <input type="text" name="system.formulaAddedToHit" id="toHit" value="{{data.system.formulaAddedToHit}}" />
             </p>
+            {{/if}}
             <p>
                 <label class="custom-roll-to-effect-label" for="toEffect">Bonus to Effect:</label>
                 <input type="text" name="system.formulaAddedToEffect" id="toEffect" value="{{data.system.formulaAddedToEffect}}" />

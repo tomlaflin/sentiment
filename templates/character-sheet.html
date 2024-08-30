@@ -133,7 +133,11 @@
                     <h4 class="custom-roll-type-column"> {{DisplayName}} </h4>
                     {{/with}}
                     {{/with}}
-                    <h4 class="custom-roll-to-hit-column"> {{customRoll.system.formulaAddedToHit}} </h4>
+                    <h4 class="custom-roll-to-hit-column">
+                        {{#if customRoll.showToHit}}
+                        {{customRoll.system.formulaAddedToHit}}
+                        {{/if}}
+                    </h4>
                     <h4 class="custom-roll-to-effect-column"> {{customRoll.system.formulaAddedToEffect}} </h4>
                     <div class="custom-roll-controls-column custom-roll-controls">
                         <a class="custom-roll-control custom-roll-open" title="Open"> <i class="fas fa-edit"></i> Open</a>
