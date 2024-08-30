@@ -60,9 +60,9 @@
                     <p class="attribute-modifier-text attribute-modifier-column">+{{attribute.system.modifier}}</p>
                     <p class="attribute-status attribute-status-column">{{attribute.statusString}}</p>
                     <div class="attribute-status-controls attribute-status-controls-column">
-                        {{#if attribute.displayRestoreButton}}<button class="button attribute-restore" type="button" title="Restore">Restore</button>{{/if}}
-                        {{#if attribute.displayLockOutButton}}<button class="button attribute-lock-out" type="button" title="Lock Out">Lock Out</button>{{/if}}
-                        {{#if attribute.displayWoundButton}}<button class="button attribute-wound" type="button" title="Wound">Wound</button>{{/if}}
+                        {{#if attribute.showRestoreButton}}<button class="button attribute-restore" type="button" title="Restore">Restore</button>{{/if}}
+                        {{#if attribute.showLockOutButton}}<button class="button attribute-lock-out" type="button" title="Lock Out">Lock Out</button>{{/if}}
+                        {{#if attribute.showWoundButton}}<button class="button attribute-wound" type="button" title="Wound">Wound</button>{{/if}}
                     </div>
                     <div class="attribute-controls attribute-controls-column">
                         <a class="attribute-control attribute-open" title="Open Attribute"> <i class="fas fa-edit"></i> Open</a>
@@ -87,7 +87,7 @@
                     {{/each}}
                     {{/select}}
                 </select>
-                {{#if displaySwingValueInput}}
+                {{#if showSwingValueInput}}
                 <input type="number" class="swing-value" name="system.swing.value" value="{{data.system.swing.value}}" min="0" data-dtype="Number" />
                 {{/if}}
             </p>

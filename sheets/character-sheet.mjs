@@ -43,7 +43,7 @@ export default class CharacterSheet extends ActorSheet {
         await this.#populateCustomRolls(context);
         await this.#populateConstants(context);
 
-        context.displaySwingValueInput = context.data.system.swing.attributeId !== AttributeIdNoSwing;
+        context.showSwingValueInput = context.data.system.swing.attributeId !== AttributeIdNoSwing;
 
         return context;
     }
@@ -84,21 +84,21 @@ export default class CharacterSheet extends ActorSheet {
             switch (attribute.system.status) {
                 case AttributeStatus.Normal:
                     attribute.statusString = "";
-                    attribute.displayRestoreButton = false;
-                    attribute.displayLockOutButton = true;
-                    attribute.displayWoundButton = true;
+                    attribute.showRestoreButton = false;
+                    attribute.showLockOutButton = true;
+                    attribute.showWoundButton = true;
                     break;
                 case AttributeStatus.LockedOut:
                     attribute.statusString = "Lockout";
-                    attribute.displayRestoreButton = true;
-                    attribute.displayLockOutButton = false;
-                    attribute.displayWoundButton = true;
+                    attribute.showRestoreButton = true;
+                    attribute.showLockOutButton = false;
+                    attribute.showWoundButton = true;
                     break;
                 case AttributeStatus.Wounded:
                     attribute.statusString = "Wounded";
-                    attribute.displayRestoreButton = true;
-                    attribute.displayLockOutButton = false;
-                    attribute.displayWoundButton = false;
+                    attribute.showRestoreButton = true;
+                    attribute.showLockOutButton = false;
+                    attribute.showWoundButton = false;
                     break;
                 default:
                     throw new Error("Unknown AttributeStatus in attribute with ID " + attribute._id);
