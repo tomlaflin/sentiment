@@ -126,7 +126,7 @@
             </header>
             <ol class="list custom-rolls-list">
                 {{#each customRolls as |customRoll index|}}
-                <li class="custom-roll list-item flexrow" data-item-id="{{customRoll._id}}">
+                <li class="custom-roll list-item flexrow" data-item-id="{{customRoll._id}}" data-custom-roll="{{toJSON customRoll}}">
                     <a class="custom-roll-label-column custom-roll-control custom-roll-execute" title="{{customRoll.name}}"> <i class="fas fa-dice-d20"></i> {{customRoll.name}}</a>
                     {{#with customRoll.system.rollType as |rollType|}}
                     {{#with (lookup ../../RollTypes rollType)}}

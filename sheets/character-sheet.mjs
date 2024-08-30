@@ -223,8 +223,8 @@ export default class CharacterSheet extends ActorSheet {
                 let dragData = {
                     macroName: this.object.name + ": " + customRoll.name,
                     actorId: this.object._id,
-                    function: customRoll.rollType,
-                    argsLiteral: `"${customRoll.formula}"`
+                    function: "executeCustomRoll",
+                    argsLiteral: `"${customRoll._id}"`
                 };
                 event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
             }, false);
