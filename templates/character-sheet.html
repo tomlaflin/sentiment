@@ -128,12 +128,12 @@
                 {{#each customRolls as |customRoll index|}}
                 <li class="custom-roll list-item flexrow" data-item-id="{{customRoll._id}}">
                     <a class="custom-roll-label-column custom-roll-control custom-roll-execute" title="{{customRoll.name}}"> <i class="fas fa-dice-d20"></i> {{customRoll.name}}</a>
-                    <p class="custom-roll-type-column"> {{customRoll.system.rollType}} </p>
-                    <p class="custom-roll-to-hit-column"> {{customRoll.system.formulaAddedToHit}} </p>
-                    <p class="custom-roll-to-effect-column"> {{customRoll.system.formulaAddedToEffect}} </p>
+                    <h4 class="custom-roll-type-column"> {{customRoll.system.rollType}} </h4>
+                    <h4 class="custom-roll-to-hit-column"> {{customRoll.system.formulaAddedToHit}} </h4>
+                    <h4 class="custom-roll-to-effect-column"> {{customRoll.system.formulaAddedToEffect}} </h4>
                     <div class="custom-roll-controls-column custom-roll-controls">
                         <a class="custom-roll-control custom-roll-open" title="Open"> <i class="fas fa-edit"></i> Open</a>
-                        <a class="custom-roll-control custom-roll-delete" title="Delete"> <i class="fas fa-trash"></i>Delete</a>
+                        <a class="custom-roll-control custom-roll-delete" title="Delete"> <i class="fas fa-trash"></i> Delete</a>
                     </div>
                 </li>
                 {{/each}}
