@@ -6,8 +6,12 @@ export class CustomRollData extends foundry.abstract.DataModel {
             rollType: new foundry.data.fields.StringField({
                 initial: RollType.RollToDo
             }),
-            formulaAddedToHit: new foundry.data.fields.StringField(),
-            formulaAddedToEffect: new foundry.data.fields.StringField()
+            formulaAddedToHit: new foundry.data.fields.StringField({
+                initial: "+0"
+            }),
+            formulaAddedToEffect: new foundry.data.fields.StringField({
+                initial: "+0"
+            })
         };
     }
 }

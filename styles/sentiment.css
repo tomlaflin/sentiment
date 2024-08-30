@@ -22,7 +22,8 @@
 }
 
 .sentiment.sheet.attribute .sheet-header,
-.sentiment.sheet.gift .sheet-header {
+.sentiment.sheet.gift .sheet-header,
+.sentiment.sheet.custom-roll .sheet-header {
 	flex: 0 0 64px;
 }
 

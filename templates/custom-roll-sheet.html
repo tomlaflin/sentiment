@@ -4,7 +4,25 @@
     </header>
     <section class="sheet-body">
         <div class="tab">
-            
+            <p>
+                <label class="custom-roll-type-label" for="rollType">Base Roll Type:</label>
+                <br />
+                <select class="custom-roll-type-selector" name="system.rollType" id="rollType">
+                    {{#select data.system.rollType}}
+                    <option value="{{RollType.RollToDo}}">Roll to Do</option>
+                    <option value="{{RollType.RollToDye}}">Roll to Dye</option>
+                    <option value="{{RollType.RecoveryRoll}}">Recovery Roll</option>
+                    {{/select}}
+                </select>
+            </p>
+            <p>
+                <label class="custom-roll-to-hit-label" for="toHit">Bonus to Hit:</label>
+                <input type="text" name="system.formulaAddedToHit" id="toHit" value="{{data.system.formulaAddedToHit}}" />
+            </p>
+            <p>
+                <label class="custom-roll-to-effect-label" for="toEffect">Bonus to Effect:</label>
+                <input type="text" name="system.formulaAddedToEffect" id="toEffect" value="{{data.system.formulaAddedToEffect}}" />
+            </p>
         </div>
     </section>
 </form>
