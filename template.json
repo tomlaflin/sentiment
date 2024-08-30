@@ -5,7 +5,7 @@
     "character": {}
   },
   "Item": {
-    "types": [ "attribute", "gift" ],
+    "types": [ "attribute", "gift", "customRoll" ],
     "htmlFields": [ "description" ],
     "attribute": {}
   }

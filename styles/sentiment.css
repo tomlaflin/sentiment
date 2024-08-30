@@ -145,11 +145,26 @@
 	margin-right: 5px;
 }
 
-.sentiment .attribute-name-column {
+.sentiment .attribute-name-column,
+.sentiment .attribute-controls-column {
 	flex-grow: 2;
 }
 
-.sentiment .attribute-color-column {
+.sentiment .attribute-color-column,
+.sentiment .attribute-modifier-column,
+.sentiment .attribute-status-column,
+.sentiment .attribute-status-controls-column {
+	flex-grow: 1;
+}
+
+.sentiment .custom-roll-label-column,
+.sentiment .custom-roll-controls-column {
+	flex-grow: 2;
+}
+
+.sentiment .custom-roll-type-column,
+.sentiment .custom-roll-to-hit-column,
+.sentiment .custom-roll-to-effect-column {
 	flex-grow: 1;
 }
 
@@ -159,25 +174,9 @@
 	margin: 5px;
 }
 
-.sentiment .attribute-modifier-column {
-	flex-grow: 1;
-}
-
 .sentiment .attribute-modifier-text {
 	font-size: var(--font-size-20);
 	font-weight: bold;
-}
-
-.sentiment .attribute-status-column {
-	flex-grow: 1;
-}
-
-.sentiment .attribute-status-controls-column {
-	flex-grow: 1;
-}
-
-.sentiment .attribute-controls-column {
-	flex-grow: 2;
 }
 
 .sentiment .custom-rolls-header,

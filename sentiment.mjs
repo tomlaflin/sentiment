@@ -13,13 +13,18 @@ import {
 } from "./documents/character.mjs";
 import CharacterSheet from "./sheets/character-sheet.mjs";
 
+import { CustomRollData } from "./documents/custom-roll.mjs";
+import CustomRollSheet from "./sheets/custom-roll-sheet.mjs";
+
 import tryCreateCharacterMacro from "./macro.mjs"
+
 
 Hooks.once("init", async function () {
     console.log(`Initializing Sentiment System`); 
 
     CONFIG.Item.dataModels.attribute = AttributeData;
     CONFIG.Item.dataModels.gift = GiftData;
+    CONFIG.Item.dataModels.customRoll = CustomRollData;
     CONFIG.Actor.dataModels.character = CharacterData;
 
     CONFIG.Actor.documentClass = Character;
@@ -34,6 +39,11 @@ Hooks.once("init", async function () {
         types: ["gift"],
         makeDefault: true,
         label: "Gift Sheet"
+    });
+    Items.registerSheet("sentiment", CustomRollSheet, {
+        types: ["customRoll"],
+        makeDefault: true,
+        label: "Custom Roll Sheet"
     });
 
     Actors.unregisterSheet("core", ActorSheet);

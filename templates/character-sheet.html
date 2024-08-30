@@ -118,27 +118,23 @@
             <p><button class="button recovery-roll" type="button" title="Recovery Roll">Recovery Roll</button></p>
             <h3>Custom Rolls:</h3>
             <header class="custom-rolls-header flexrow">
-                <span>Label</span>
-                <span>Roll Type</span>
-                <span>Additional Dice Formula</span>
-                <span/>
+                <span class="custom-roll-label-column">Label</span>
+                <span class="custom-roll-type-column">Roll Type</span>
+                <span class="custom-roll-to-hit-column">To Hit</span>
+                <span class="custom-roll-to-effect-column">To Effect</span>
+                <span class="custom-roll-controls-column"/>
             </header>
             <ol class="list custom-rolls-list">
-                {{#each data.system.customRolls as |customRoll index|}}
-                <li class="custom-roll list-item flexrow" data-index="{{index}}" data-custom-roll="{{toJSON customRoll}}">
-                    <input type="text" name="system.customRolls.{{index}}.name" value="{{customRoll.name}}" />
-                    <select class="custom-roll-type-selector" name="system.customRolls.{{index}}.rollType">
-                        {{#select customRoll.rollType}}
-                        <option value="{{../RollType.RollToDo}}">Roll to Do</option>
-                        <option value="{{../RollType.RollToDye}}">Roll to Dye</option>
-                        <option value="{{../RollType.RecoveryRoll}}">Recovery Roll</option>
-                        {{/select}}
-                    </select>
-                    <input type="text" name="system.customRolls.{{index}}.formula" value="{{customRoll.formula}}" />
-                    <div class="custom-roll-controls">
-                        <a class="custom-roll-control custom-roll-execute" title="Roll"> <i class="fas fa-dice-d20"></i>Roll</a>
+                {{#each customRolls as |customRoll index|}}
+                <li class="custom-roll list-item flexrow" data-item-id="{{customRoll._id}}">
+                    <a class="custom-roll-label-column custom-roll-control custom-roll-execute" title="{{customRoll.name}}"> <i class="fas fa-dice-d20"></i> {{customRoll.name}}</a>
+                    <p class="custom-roll-type-column"> {{customRoll.system.rollType}} </p>
+                    <p class="custom-roll-to-hit-column"> {{customRoll.system.formulaAddedToHit}} </p>
+                    <p class="custom-roll-to-effect-column"> {{customRoll.system.formulaAddedToEffect}} </p>
+                    <div class="custom-roll-controls-column custom-roll-controls">
+                        <a class="custom-roll-control custom-roll-open" title="Open"> <i class="fas fa-edit"></i> Open</a>
                         <a class="custom-roll-control custom-roll-delete" title="Delete"> <i class="fas fa-trash"></i>Delete</a>
-                    </div>         
+                    </div>
                 </li>
                 {{/each}}
             </ol>

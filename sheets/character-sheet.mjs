@@ -40,6 +40,7 @@ export default class CharacterSheet extends ActorSheet {
         await this.#populateAttributes(context);
         await this.#populateAttributeStatusProperties(context);
         await this.#populateGifts(context);
+        await this.#populateCustomRolls(context);
         await this.#populateConstants(context);
 
         context.displaySwingValueInput = context.data.system.swing.attributeId !== AttributeIdNoSwing;
@@ -106,7 +107,7 @@ export default class CharacterSheet extends ActorSheet {
     }
 
     /**
-    * Iterate all owned items and embed collections contain gifts of each different Equip Status into the context for easy access.
+    * Iterate all owned items and embed collections containing gifts of each different Equip Status into the context for easy access.
     * @param context
     * @private
     */
@@ -126,6 +127,20 @@ export default class CharacterSheet extends ActorSheet {
         context.primaryGifts = this.#gifts[GiftEquipStatus.Primary];
         context.equippedGifts = this.#gifts[GiftEquipStatus.Equipped];
         context.unequippedGifts = this.#gifts[GiftEquipStatus.Unequipped];
+    }
+
+    /**
+    * Iterate all owned items and embed a collection containing only the custom rolls into the context for easy access.
+    * @param context
+    * @private
+    */
+    #populateCustomRolls(context) {
+        context.customRolls = [];
+        for (let item of context.items) {
+            if (item.type == "customRoll") {
+                context.customRolls.push(item);
+            }
+        }
     }
 
     /**
@@ -158,6 +173,7 @@ export default class CharacterSheet extends ActorSheet {
         html.find(".gift-add").click(this.#onGiftAdd.bind(this));
         html.find(".gift-delete").click(this.#onGiftDelete.bind(this));
         html.find(".custom-roll-add").click(this.#onCustomRollAdd.bind(this));
+        html.find(".custom-roll-open").click(this.#onCustomRollOpen.bind(this));
         html.find(".custom-roll-delete").click(this.#onCustomRollDelete.bind(this));
         html.find(".custom-roll-execute").click(this.#onCustomRollExecute.bind(this));
         html.find(".drop-swing").click(this.#onDropSwing.bind(this));
@@ -342,7 +358,24 @@ export default class CharacterSheet extends ActorSheet {
     async #onCustomRollAdd(event) {
         event.preventDefault();
 
-        return this.object.addCustomRoll();
+        const customRollData = {
+            name: "New Custom Roll",
+            type: "customRoll"
+        };
+
+        return await Item.create(customRollData, { parent: this.actor });
+    }
+
+    /**
+    * Handle event when the user opens a custom roll.
+    * @param event
+    * @private
+    */
+    #onCustomRollOpen(event) {
+        event.preventDefault();
+
+        const customRoll = this.#getItemFromListEvent(event);
+        customRoll.sheet.render(true);
     }
 
     /**
@@ -353,10 +386,8 @@ export default class CharacterSheet extends ActorSheet {
     async #onCustomRollDelete(event) {
         event.preventDefault();
 
-        const listItem = $(event.currentTarget).parents(".list-item");
-        const index = listItem.data("index");
-
-        return this.object.deleteCustomRoll(index);
+        const customRoll = this.#getItemFromListEvent(event);
+        customRoll.delete();
     }
 
     /**
@@ -367,10 +398,7 @@ export default class CharacterSheet extends ActorSheet {
     async #onCustomRollExecute(event) {
         event.preventDefault();
 
-        const listItem = $(event.currentTarget).parents(".list-item");
-        const index = listItem.data("index");
-
-        return this.object.executeCustomRoll(index);
+        // NYI
     }
 
     /** @inheritdoc */
