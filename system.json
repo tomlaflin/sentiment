@@ -4,7 +4,8 @@
   "description": "Implementation of the Sentiment TTRPG system for Foundry VTT.",
   "version": "0.1.4",
   "compatibility": {
-    "verified": "11"
+    "minimum": "11",
+    "verified": "12.331"
   },
   "url": "https://github.com/tomlaflin/sentiment",
   "manifest": "https://raw.githubusercontent.com/tomlaflin/sentiment/main/system.json",
