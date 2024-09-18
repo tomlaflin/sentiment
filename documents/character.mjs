@@ -67,7 +67,7 @@ export class Character extends Actor {
     /**
     * Returns an array of the character's attributes, culled from the set of all owned items.
     */
-    #getAttributes() {
+    getAttributes() {
         return this.items.filter((item) => item.type === "attribute");
     }
 
@@ -157,7 +157,7 @@ export class Character extends Actor {
     * @private
     */
     async #renderRollToDoChooseAttributeDialog() {
-        const attributes = this.#getAttributes();
+        const attributes = this.getAttributes();
         const contentTemplatePath = "systems/sentiment/templates/rolls/roll-to-do-choose-attribute.html";
         const content = await renderTemplate(contentTemplatePath, {});
 
@@ -322,7 +322,7 @@ export class Character extends Actor {
     async #rollAttributeDice(swingAttributeDie) {
         let attributeDice = [];
 
-        const attributes = this.#getAttributes();
+        const attributes = this.getAttributes();
         for (const attribute of attributes) {
             if (attribute._id == swingAttributeDie?.attribute._id) {
                 attributeDice.push(swingAttributeDie);
@@ -377,7 +377,7 @@ export class Character extends Actor {
     * @private
     */
     #releaseAttributesFromLockout() {
-        this.#getAttributes().filter((attribute) => attribute.system.status === AttributeStatus.LockedOut).forEach((lockedOutAttribute) =>
+        this.getAttributes().filter((attribute) => attribute.system.status === AttributeStatus.LockedOut).forEach((lockedOutAttribute) =>
             lockedOutAttribute.update({ "system.status": AttributeStatus.Normal })
         );
     }
@@ -434,6 +434,18 @@ export class Character extends Actor {
         }
 
         return this.#renderToChatMessage(templatePath, templateValues);
+    }
+
+    /**
+    * Set the charater's swing to the specified attribute and value.
+    * @param attributeId
+    * @param value
+    */
+    setSwing(attributeId, value) {
+        this.update({
+            "system.swing.attributeId": attributeId,
+            "system.swing.value": value
+        });
     }
 
     /**
