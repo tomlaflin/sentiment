@@ -240,7 +240,7 @@ export default class CharacterSheet extends ActorSheet {
         event.preventDefault();
 
         const attribute = this.#getItemFromListEvent(event);
-        this.object.restoreAttribute(attribute._id);
+        this.object.setAttributeStatus(attribute._id, AttributeStatus.Normal);
     }
 
     /**
@@ -252,7 +252,7 @@ export default class CharacterSheet extends ActorSheet {
         event.preventDefault();
         
         const attribute = this.#getItemFromListEvent(event);
-        this.object.lockOutAttribute(attribute._id);
+        this.object.setAttributeStatus(attribute._id, AttributeStatus.LockedOut);
     }
 
     /**
@@ -264,7 +264,7 @@ export default class CharacterSheet extends ActorSheet {
         event.preventDefault();
 
         const attribute = this.#getItemFromListEvent(event);
-        this.object.woundAttribute(attribute._id);
+        this.object.setAttributeStatus(attribute._id, AttributeStatus.Wounded);
     }
 
     /**

@@ -454,36 +454,15 @@ export class Character extends Actor {
     }
 
     /**
-    * Restore the specified attribute.
+    * Set the status of the specified attribute.
     * @param attributeId
+    * @param status
     */
-    restoreAttribute(attributeId) {
+    setAttributeStatus(attributeId, status) {
         const attribute = this.items.find((item) => item._id === attributeId);
-        attribute.update({ "system.status": AttributeStatus.Normal });
-    }
+        attribute.update({ "system.status": status });
 
-    /**
-    * Lock out the specified attribute.
-    * @param attributeId
-    */
-    lockOutAttribute(attributeId) {
-        const attribute = this.items.find((item) => item._id === attributeId);
-        attribute.update({ "system.status": AttributeStatus.LockedOut });
-
-        if (attributeId === this.system.swing.attributeId) {
-            this.dropSwing();
-        }
-    }
-
-    /**
-    * Wound the specified attribute.
-    * @param attributeId
-    */
-    woundAttribute(attributeId) {
-        const attribute = this.items.find((item) => item._id === attributeId);
-        attribute.update({ "system.status": AttributeStatus.Wounded });
-
-        if (attributeId === this.system.swing.attributeId) {
+        if (status !== AttributeStatus.Normal) {
             this.dropSwing();
         }
     }
