@@ -19,7 +19,8 @@ import CustomRollSheet from "./sheets/custom-roll-sheet.mjs";
 
 import {
     RollTypes,
-    AttributeStatus
+    AttributeStatus,
+    AttributeStatusStrings
 } from "./enums.mjs"
 
 import tryCreateCharacterMacro from "./macro.mjs"
@@ -36,6 +37,7 @@ Hooks.once("init", async function () {
     CONFIG.Sentiment = {
         RollTypes,
         AttributeStatus,
+        AttributeStatusStrings,
         AttributeIdNoSwing
     };
 

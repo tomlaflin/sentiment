@@ -27,3 +27,9 @@ export const RollTypes = Object.freeze({
         FunctionName: "recoveryRoll"
     }
 });
+
+export const AttributeStatusStrings = new Map([
+    [AttributeStatus.Normal, "Normal"],
+    [AttributeStatus.LockedOut, "Locked Out"],
+    [AttributeStatus.Wounded, "Wounded"]
+]);

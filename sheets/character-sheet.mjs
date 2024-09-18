@@ -1,7 +1,8 @@
 import {
     AttributeStatus,
     GiftEquipStatus,
-    RollTypes
+    RollTypes,
+    AttributeStatusStrings
 } from "../enums.mjs";
 
 import { AttributeIdNoSwing } from "../documents/character.mjs"
@@ -81,27 +82,27 @@ export default class CharacterSheet extends ActorSheet {
       */
     #populateAttributeStatusProperties(context) {
         for (let attribute of context.attributes) {
+            attribute.statusString = AttributeStatusStrings.get(attribute.system.status);
+            if (attribute.statusString === undefined) {
+                throw new Error(`Unexpected AttributeStatus ${attribute.system.status} in attribute with ID ${attribute._id}`);
+            }
+
             switch (attribute.system.status) {
                 case AttributeStatus.Normal:
-                    attribute.statusString = "";
                     attribute.showRestoreButton = false;
                     attribute.showLockOutButton = true;
                     attribute.showWoundButton = true;
                     break;
                 case AttributeStatus.LockedOut:
-                    attribute.statusString = "Lockout";
                     attribute.showRestoreButton = true;
                     attribute.showLockOutButton = false;
                     attribute.showWoundButton = true;
                     break;
                 case AttributeStatus.Wounded:
-                    attribute.statusString = "Wounded";
                     attribute.showRestoreButton = true;
                     attribute.showLockOutButton = false;
                     attribute.showWoundButton = false;
                     break;
-                default:
-                    throw new Error("Unknown AttributeStatus in attribute with ID " + attribute._id);
             }
         }
     }
