@@ -474,7 +474,7 @@ export class Character extends Actor {
         const attribute = this.items.find((item) => item._id === attributeId);
         attribute.update({ "system.status": status });
 
-        if (status !== AttributeStatus.Normal) {
+        if (attributeId === this.system.swing.attributeId && status !== AttributeStatus.Normal) {
             this.dropSwing();
         }
     }
