@@ -4,7 +4,9 @@ export default class GiftSheet extends ItemSheet {
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
             classes: ["sentiment", "sheet", "gift"],
-            template: "systems/sentiment/templates/gift-sheet.html"
+            template: "systems/sentiment/templates/gift-sheet.html",
+            width: 600,
+            height: 600
         });
     }
     
