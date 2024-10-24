@@ -8,11 +8,7 @@
                 <label class="custom-roll-type-label" for="rollType">Base Roll Type:</label>
                 <br />
                 <select class="custom-roll-type-selector" name="system.rollType" id="rollType">
-                    {{#select data.system.rollType}}
-                    <option value="RollToDo">{{RollTypes.RollToDo.DisplayName}}</option>
-                    <option value="RollToDye">{{RollTypes.RollToDye.DisplayName}}</option>
-                    <option value="RecoveryRoll">{{RollTypes.RecoveryRoll.DisplayName}}</option>
-                    {{/select}}
+                    {{selectOptions rollTypeOptions selected=data.system.rollType}}
                 </select>
             </p>
             {{#if showToHit}}

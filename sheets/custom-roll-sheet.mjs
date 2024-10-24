@@ -13,7 +13,12 @@ export default class CustomRollSheet extends ItemSheet {
     /** @inheritdoc */
     async getData(options) {
         const context = await super.getData(options);
-        context.RollTypes = RollTypes;
+
+        context.rollTypeOptions = {};
+        Object.keys(RollTypes).forEach((rollType) => {
+            context.rollTypeOptions[rollType] = RollTypes[rollType].DisplayName;
+        });
+
         context.showToHit = context.data.system.rollType === "RollToDo";
 
         return context;
