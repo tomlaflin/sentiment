@@ -38,11 +38,12 @@ export default class CharacterSheet extends ActorSheet {
         const context = await super.getData(options);
 
         await this.#populateDescription(context);
-        await this.#populateAttributes(context);
-        await this.#populateAttributeStatusProperties(context);
-        await this.#populateGifts(context);
-        await this.#populateCustomRolls(context);
-        await this.#populateConstants(context);
+        this.#populateAttributes(context);
+        this.#populateAttributeStatusProperties(context);
+        this.#populateSwingAttributeOptions(context);
+        this.#populateGifts(context);
+        this.#populateCustomRolls(context);
+        this.#populateConstants(context);
 
         context.showSwingValueInput = context.data.system.swing.attributeId !== AttributeIdNoSwing;
 
@@ -105,6 +106,23 @@ export default class CharacterSheet extends ActorSheet {
                     break;
             }
         }
+    }
+
+    /**
+      * Create key-value pairs for the swing attribute dropdown and embed them into the context for easy access.
+      * @param context
+      * @private
+      */
+    #populateSwingAttributeOptions(context) {
+        context.swingAttributeOptions = {
+            [AttributeIdNoSwing]: "None"
+        };
+
+        context.attributes.forEach((attribute) => {
+            if (attribute.system.status === AttributeStatus.Normal) {
+                context.swingAttributeOptions[attribute._id] = attribute.name;
+            }
+        });
     }
 
     /**
